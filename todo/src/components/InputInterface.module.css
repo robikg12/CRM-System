@@ -1,0 +1,44 @@
+.wrapperInterface {
+    width: 100%;
+    display: flex;
+    gap: 0px 20px;
+
+}
+
+.input {
+    flex: 1 1 65%;
+    outline: none;
+    border-top: unset;
+    border-left: unset;
+    border-right: unset;
+    border-bottom: 1px solid #697389;
+    color: #444444;
+    font-size: 14px;
+    font-family: Roboto;
+}
+
+.button {
+    height: 50px;
+    flex: 1 1 35%;
+    background-color: rgb(83, 145, 254);
+    border: none;
+    padding: 0px;
+    margin: 0px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px 10px 10px 10px;
+    color: white;
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 18px;
+    transition: background-color 180ms;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: rgb(54, 127, 255);
+}
+.button:active {
+    transition: background-color 0ms ;
+    background-color: rgb(73, 140, 255);
+}
