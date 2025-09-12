@@ -6,3 +6,9 @@
     height: auto;
     background-color: white;
 }
+
+.lodaingText {
+    color: #000000;
+    font-size: 22px;
+    font-family: Roboto;
+}

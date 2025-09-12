@@ -36,7 +36,7 @@
 
 
 
-.itemText {
+.itemInputText {
     flex-grow: 1;
     font-family: Roboto;
     font-weight: 500;
@@ -44,10 +44,19 @@
     font-size: 16px;
     margin-left: 12px;
     letter-spacing: -0.1px;
+    border: none !important;
+    outline: none;
+    background-color: transparent;
 }
 
-.completeBtn,
-.deleteBtn {
+.blue {
+    color: rgb(51, 104, 219);
+}
+
+
+.editBtn,
+.deleteBtn,
+.cancelButton {
     display: flex;
     flex-basis: 12.5%;
     width: 52px;
@@ -63,11 +72,22 @@
     cursor: pointer;
 }
 
-.completeBtn {
+.editBtn {
     background-color: rgb(87, 145, 255);
     background-image: url(../assets/img/icons/note.svg);
 
 }
+
+.editBtnClicked {
+    background-image: url(../assets/img/icons/save.png) !important;
+}
+
+.cancelButton {
+    background-color: rgb(212, 204, 36);
+    background-image: url(../assets/img/icons/cancel.svg);
+    margin-left: 14px;
+}
+
 
 .deleteBtn {
     background-color: rgb(255, 101, 88) !important;
@@ -75,12 +95,12 @@
     margin-left: 14px;
 }
 
-.completeBtn:hover,
+.editBtn:hover,
 .deleteBtn:hover {
     opacity: 0.89;
 }
 
-.completeBtn:active,
+.editBtn:active,
 .deleteBtn:active {
     opacity: 0.7;
 }
