@@ -1,0 +1,14 @@
+.wrapperOfAllList {
+    flex: 0 0 100%;
+    margin-top: 20px;
+    padding: 10px 10px 10px 10px;
+    flex-direction: column;
+    height: auto;
+    background-color: white;
+}
+
+.lodaingText {
+    color: #000000;
+    font-size: 22px;
+    font-family: Roboto;
+}
