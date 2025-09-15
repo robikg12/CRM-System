@@ -1,11 +1,11 @@
 import classes from './ListItem.module.css';
 
 import { useState } from 'react';
-import { editItem, fetchTodoItems, deleteItem } from '../https';
+import { editItem,  deleteItem } from '../api/https';
 import { itemValidation } from '../validation';
 
 
-function ListItem({ isDone, title, itemId, setItemsList, setError }) {
+function ListItem({ isDone, title, itemId, setError, refreshData }) {
 
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitleText, setEditedTitleText] = useState(title);
@@ -18,8 +18,7 @@ function ListItem({ isDone, title, itemId, setItemsList, setError }) {
                 setIsLoading(true);
                 const newStatus = event.target.checked;
                 await editItem(itemId, newStatus, title);
-                const fetchItemsResponse = await fetchTodoItems();
-                await setItemsList(fetchItemsResponse);
+                await refreshData();
                 setIsLoading(false);
             }
             catch (error) {
@@ -41,9 +40,8 @@ function ListItem({ isDone, title, itemId, setItemsList, setError }) {
                 if (validationStatus.isValid) {
                     try {
                         setIsLoading(true);
-                        const editResponse = await editItem(itemId, isDone, editedTitleText);
-                        const fetchItemsResponse = await fetchTodoItems();
-                        await setItemsList(fetchItemsResponse);
+                        await editItem(itemId, isDone, editedTitleText);
+                        await refreshData();
                         setIsLoading(false);
                     }
                     catch (error) {
@@ -70,8 +68,7 @@ function ListItem({ isDone, title, itemId, setItemsList, setError }) {
                 setIsLoading(true);
                 console.log(itemId);
                 await deleteItem(itemId);
-                const fetchItemsResponse = await fetchTodoItems();
-                await setItemsList(fetchItemsResponse);
+                await refreshData();
                 setIsLoading(false);
             }
             catch (error) {
@@ -87,8 +84,8 @@ function ListItem({ isDone, title, itemId, setItemsList, setError }) {
     if (isLoading) {
         editableItemTitle = <p className={`${classes.itemInputText} ${classes.blue}`}>Загрузочка...</p>;
     }
-    
-    let editButton = <button className={`${classes.editBtn} ${isEditing ? classes.editBtnClicked : ''}`} onClick={handleEditing}></button>;
+
+    let editButton = <button className={`${classes.editBtn} ${isEditing ? classes.editBtnClicked : ''} ${isDone ? classes.buttonBlocked : ''}`} onClick={handleEditing}></button>;
     let cancelButton = <button className={`${classes.cancelButton}`} onClick={handleCancel}></button>;
 
 

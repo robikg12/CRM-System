@@ -88,6 +88,10 @@
     margin-left: 14px;
 }
 
+.buttonBlocked {
+    cursor: not-allowed;
+}
+
 
 .deleteBtn {
     background-color: rgb(255, 101, 88) !important;

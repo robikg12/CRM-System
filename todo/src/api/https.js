@@ -1,18 +1,19 @@
-export async function fetchTodoItems() {
+export async function fetchItems(category) {
 
-    const response = await fetch(`https://easydev.club/api/v1/todos`);
+    const params = {
+        filter: category
+    };
+    const queryParams = new URLSearchParams(params);
+
+    const response = await fetch(`https://easydev.club/api/v1/todos?${queryParams}`);
     const resData = await response.json();
     if (!response.ok) {
-        throw new Error('Не удалось получить записи списка задач');
+        throw new Error('Не удалось получить записи списка задач по категории');
     }
+    const resItemsAndCount = { categoryArray: resData.data, count: resData.info }
+    
+    return resItemsAndCount;
 
-    let sortedItems = {
-        "all": resData.data,
-        "inWork": resData.data.filter((item) => item.isDone === false),
-        "completed": resData.data.filter((item) => item.isDone === true)
-    }
-
-    return sortedItems;
 }
 
 // TODO изучить что такое .then

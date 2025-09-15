@@ -1,25 +1,26 @@
-import classes from './ListMenu.module.css'
+import classes from './ListMenu.module.css';
 
-function ListMenu({ currentCategory, setCurrentCategory, items, itemsIsFetching }) {
+function ListMenu({ currentCategory, setCurrentCategory, items, refreshData }) {
 
     async function handleSelect(selected) {
         setCurrentCategory(selected);
+        await refreshData(selected);
     }
 
     return (
         <div className={classes.menu}>
-            
+
             <p className={`${classes.menuItem} ${currentCategory === 'all' ? classes.selected : ''}`}
                 onClick={() => handleSelect('all')}>
-                Все {!itemsIsFetching && `(${items.all.length})`}
+                Все {items.count.all !== null && `(${items.count.all})`}
             </p>
             <p className={`${classes.menuItem} ${currentCategory === 'inWork' ? classes.selected : ''}`}
                 onClick={() => handleSelect('inWork')}>
-                в работе {!itemsIsFetching && `(${items.inWork.length})`}
+                в работе {items.count.all !== null && `(${items.count.inWork})`}
             </p>
             <p className={`${classes.menuItem} ${currentCategory === 'completed' ? classes.selected : ''}`}
                 onClick={() => handleSelect('completed')}>
-                сделано {!itemsIsFetching && `(${items.completed.length})`}
+                сделано {items.count.all !== null && `(${items.count.completed})`}
             </p>
         </div >
     );

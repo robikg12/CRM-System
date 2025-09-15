@@ -44,3 +44,12 @@ body {
   font-size: 15px;
   box-sizing: border-box;
 }
+
+.wrapperOfAllList {
+  flex: 0 0 100%;
+  margin-top: 20px;
+  padding: 10px 10px 10px 10px;
+  flex-direction: column;
+  height: auto;
+  background-color: white;
+}

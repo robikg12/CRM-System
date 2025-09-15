@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { createNewItem, fetchTodoItems } from '../https';
+import { createNewItem } from '../api/https';
 import { itemValidation } from '../validation';
 
 import classes from './InputInterface.module.css';
 
 
-function InputInterface({ setItemsList, setError }) {
+function InputInterface({ setError, refreshData }) {
 
     const [newItemText, setNewItemText] = useState('');
 
@@ -20,8 +20,7 @@ function InputInterface({ setItemsList, setError }) {
         if (validationResponse.isValid) {
             try {
                 await createNewItem(newItemText);
-                const updatedItems = await fetchTodoItems();
-                await setItemsList(updatedItems);
+                await refreshData();
                 setNewItemText('');
             }
             catch (error) {
@@ -29,7 +28,7 @@ function InputInterface({ setItemsList, setError }) {
             }
         }
     }
-
+    
     return (
         <div className={classes.wrapperInterface}>
             <input className={classes.input} type="text" placeholder='Нужно сделать...' value={newItemText} onChange={handleChange} />
