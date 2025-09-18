@@ -10,15 +10,14 @@ export async function fetchItems(category) {
     if (!response.ok) {
         throw new Error('Не удалось получить записи списка задач по категории');
     }
-    const resItemsAndCount = { categoryArray: resData.data, count: resData.info }
-    
-    return resItemsAndCount;
+
+    return resData;
 
 }
 
 // TODO изучить что такое .then
 export async function createNewItem(title) {
-    const newItem = { "isDone": false, "title": title };
+    const newItem = { isDone: false, title: title };
     const response = await fetch('https://easydev.club/api/v1/todos', {
         method: 'POST',
         headers: {
@@ -34,7 +33,7 @@ export async function createNewItem(title) {
 }
 
 export async function editItem(id, status, title) {
-    const editedItem = { "isDone": status, "title": title };
+    const editedItem = { isDone: status, title: title };
     const response = await fetch(`https://easydev.club/api/v1/todos/${id}`, {
         method: 'PUT',
         headers: {

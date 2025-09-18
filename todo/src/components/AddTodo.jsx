@@ -5,7 +5,7 @@ import { itemValidation } from '../validation';
 import classes from './InputInterface.module.css';
 
 
-function InputInterface({ setError, refreshData }) {
+function AddTodo({ setError, refreshData }) {
 
     const [newItemText, setNewItemText] = useState('');
 
@@ -24,11 +24,11 @@ function InputInterface({ setError, refreshData }) {
                 setNewItemText('');
             }
             catch (error) {
-                console.log(`Не получилось создать запись. Ошибка ${error}`);
+                alert(`Не получилось создать запись. Ошибка ${error}`);
             }
         }
     }
-    
+
     return (
         <div className={classes.wrapperInterface}>
             <input className={classes.input} type="text" placeholder='Нужно сделать...' value={newItemText} onChange={handleChange} />
@@ -37,4 +37,4 @@ function InputInterface({ setError, refreshData }) {
     );
 }
 
-export default InputInterface
+export default AddTodo

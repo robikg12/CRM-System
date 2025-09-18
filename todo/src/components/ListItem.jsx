@@ -1,7 +1,7 @@
 import classes from './ListItem.module.css';
 
 import { useState } from 'react';
-import { editItem,  deleteItem } from '../api/https';
+import { editItem, deleteItem } from '../api/https';
 import { itemValidation } from '../validation';
 
 
@@ -22,7 +22,7 @@ function ListItem({ isDone, title, itemId, setError, refreshData }) {
                 setIsLoading(false);
             }
             catch (error) {
-                console.log(`Не удалось отредаткировать статус задачки ${error}`);
+                alert(`Не удалось отредаткировать статус задачки ${error}`);
             }
         }
     }
@@ -45,7 +45,7 @@ function ListItem({ isDone, title, itemId, setError, refreshData }) {
                         setIsLoading(false);
                     }
                     catch (error) {
-                        console.log(`Не получилось отредактировать данные ${error}`);
+                        alert(`Не получилось отредактировать данные ${error}`);
                     }
                 }
                 else {
@@ -66,13 +66,12 @@ function ListItem({ isDone, title, itemId, setError, refreshData }) {
         if (itemId) {
             try {
                 setIsLoading(true);
-                console.log(itemId);
                 await deleteItem(itemId);
                 await refreshData();
                 setIsLoading(false);
             }
             catch (error) {
-                console.log(`Ошибка при удалении записи ${error}`);
+                alert(`Ошибка при удалении записи ${error}`);
             }
         }
     }
