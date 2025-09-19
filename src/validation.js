@@ -9,7 +9,7 @@ export function titleValidation(title) {
         validationInfo.message = 'В записи может быть максимум 64 символа';
         return validationInfo;
     }
-
+    
     const filledText = title.trim();
     if (filledText.length < 2) {
         validationInfo.message = 'Запись должна содержать хотя бы 2 непустых символа';

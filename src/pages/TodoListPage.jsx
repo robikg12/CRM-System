@@ -1,6 +1,6 @@
-import AddTodo from "../components/AddTodo";
-import ListInterface from "../components/ListInterface";
-import ListMenu from '../components/ListMenu';
+import AddTodo from "../components/AddTodo/AddTodo";
+import TodoFilter from "../components/TodoFilter/TodoFilter";
+import TodosList from "../components/TodosList/TodosList"
 
 import { useState, useEffect } from "react";
 import { fetchItems } from "../api/https";
@@ -18,6 +18,13 @@ function TodoListPage() {
     const [currentCategory, setCurrentCategory] = useState('all');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState({ isValid: true, message: '' });
+
+
+    // Не врубился немного с этой правкой, что значит перезарослить, но надеюсь делаю правильно
+    async function handleSelectCategory(category) {
+        setCurrentCategory(category);
+        await refreshData(category);
+    }
 
 
     async function refreshData(category) {
@@ -47,14 +54,13 @@ function TodoListPage() {
             <AddTodo refreshData={refreshData} setError={setError} />
             {!error.isValid && <div className="errorBlock">{error.message}</div>}
             <div className="wrapperOfAllList">
-                <ListMenu
+                <TodoFilter
                     currentCategory={currentCategory}
-                    setCurrentCategory={setCurrentCategory}
                     todosData={todosData}
-                    refreshData={refreshData}
+                    handleSelectCategory={handleSelectCategory}
                 />
 
-                <ListInterface
+                <TodosList
                     todosData={todosData}
                     refreshData={refreshData}
                     isLoading={isLoading}

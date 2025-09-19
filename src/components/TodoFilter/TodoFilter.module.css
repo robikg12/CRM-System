@@ -5,18 +5,19 @@
     justify-content: space-between;
     height: auto;
     margin-bottom: 20px;
+    list-style: none;
+    padding: 0px;
 }
 
 .menuItem {
-    font-family: Roboto;
     font-size: 26px;
-    color: rgb(145, 146, 148);
+    color: #919294;
     cursor: pointer;
     user-select: none;
 }
 
 .selected {
-    color: rgb(44, 122, 223);
+    color: #2c7adf;
     text-decoration: underline;
-    text-decoration-color: rgb(44, 122, 223);
+    text-decoration-color: #2c7adf;
 }
