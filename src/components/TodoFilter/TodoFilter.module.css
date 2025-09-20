@@ -1,0 +1,23 @@
+.menu {
+    display: flex;
+    flex-basis: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    height: auto;
+    margin-bottom: 20px;
+    list-style: none;
+    padding: 0px;
+}
+
+.menuItem {
+    font-size: 26px;
+    color: #919294;
+    cursor: pointer;
+    user-select: none;
+}
+
+.selected {
+    color: #2c7adf;
+    text-decoration: underline;
+    text-decoration-color: #2c7adf;
+}

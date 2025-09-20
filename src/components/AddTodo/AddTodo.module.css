@@ -1,0 +1,41 @@
+.wrapperInterface {
+    width: 100%;
+    display: flex;
+    gap: 0px 20px;
+
+}
+
+.input {
+    flex: 1 1 314px;
+    outline: none;
+    border-top: unset;
+    border-left: unset;
+    border-right: unset;
+    border-bottom: 1px solid #697389;
+    color: #444444;
+}
+
+.button {
+    color: #ffffff;
+    font-size: 18px;
+    height: 50px;
+    flex: 1 1 168px;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    background-color: #5391fe;
+    transition: background-color 180ms;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #367fff;
+}
+
+.button:active {
+    transition: background-color 0ms;
+    background-color: #498cff;
+}
