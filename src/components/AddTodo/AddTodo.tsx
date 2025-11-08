@@ -2,26 +2,34 @@ import { useState } from 'react';
 import { createNewItem } from '../../api/https'
 import { titleValidation } from '../../validation';
 
+
+// TODO: Посмотреть должен ли я заносить типы в отдельный файл
+import type { Status } from '../../types/types';
+
 import classes from './AddTodo.module.css';
 
+// TODO: Разобраться, показывает что category string | undefined - undefined смущает.
+const AddTodo: React.FC<{
+    refreshData: (category?: string) => Promise<void>;
+    recordError(error: Status): void
+}> = (props) => {
 
-function AddTodo({ setError, refreshData }) {
 
-    const [title, setTitle] = useState('');
+    const [title, setTitle] = useState<string>('');
 
-    function handleChangeTitle(event) {
+    function handleChangeTitle(event: React.ChangeEvent<HTMLInputElement>) {
         setTitle(event.target.value);
     }
 
-    async function handleAddItem(event) {
+    async function handleAddItem(event: React.FormEvent) {
 
         event.preventDefault();
         const validationInfo = titleValidation(title);
-        setError(validationInfo);
+        props.recordError(validationInfo);
         if (validationInfo.isValid) {
             try {
                 await createNewItem(title);
-                await refreshData();
+                await props.refreshData();
                 setTitle('');
             }
             catch (error) {
@@ -39,4 +47,4 @@ function AddTodo({ setError, refreshData }) {
     );
 }
 
-export default AddTodo
+export default AddTodo;
