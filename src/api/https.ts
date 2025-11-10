@@ -56,7 +56,7 @@ export async function editItem(id: number, status: boolean, title: string): Prom
 }
 
 
-export async function deleteItem(id: number): Promise<string> {
+export async function deleteItem(id: number) {
     const response = await fetch(`${baseUrl}/${id}`, {
         method: 'DELETE',
         headers: {
@@ -64,11 +64,11 @@ export async function deleteItem(id: number): Promise<string> {
         },
     });
 
-    const resData = await response.json();
+
     if (!response.ok) {
         throw new Error('Не удалось удалить запись');
     }
 
-    return resData;
+    return response;
 }
 
