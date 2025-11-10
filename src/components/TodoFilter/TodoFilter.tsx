@@ -1,27 +1,27 @@
 import classes from './TodoFilter.module.css';
 
-import type { TodosData } from '../../types/types';
+import type { ItemCount } from '../../types/types';
 
 const TodoFilter: React.FC<{
     currentCategory: string;
-    todosData: TodosData;
+    counts: ItemCount;
     handleSelectCategory: (category: string) => Promise<void>
-}> = (props) => {
+}> = ({ currentCategory, counts, handleSelectCategory }) => {
 
     return (
         <nav>
             <ul className={classes.menu}>
-                <li className={`${classes.menuItem} ${props.currentCategory === 'all' ? classes.selected : ''}`}
-                    onClick={() => props.handleSelectCategory('all')}>
-                    Все {props.todosData.counts.all !== null && `(${props.todosData.counts.all})`}
+                <li className={`${classes.menuItem} ${currentCategory === 'all' ? classes.selected : ''}`}
+                    onClick={() => handleSelectCategory('all')}>
+                    Все {counts.all && `(${counts.all})`}
                 </li>
-                <li className={`${classes.menuItem} ${props.currentCategory === 'inWork' ? classes.selected : ''}`}
-                    onClick={() => props.handleSelectCategory('inWork')}>
-                    в работе {props.todosData.counts.all !== null && `(${props.todosData.counts.inWork})`}
+                <li className={`${classes.menuItem} ${currentCategory === 'inWork' ? classes.selected : ''}`}
+                    onClick={() => handleSelectCategory('inWork')}>
+                    в работе {counts.inWork && `(${counts.inWork})`}
                 </li>
-                <li className={`${classes.menuItem} ${props.currentCategory === 'completed' ? classes.selected : ''}`}
-                    onClick={() => props.handleSelectCategory('completed')}>
-                    сделано {props.todosData.counts.all !== null && `(${props.todosData.counts.completed})`}
+                <li className={`${classes.menuItem} ${currentCategory === 'completed' ? classes.selected : ''}`}
+                    onClick={() => handleSelectCategory('completed')}>
+                    сделано {counts.completed && `(${counts.completed})`}
                 </li>
             </ul >
         </nav>

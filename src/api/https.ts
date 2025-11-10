@@ -1,14 +1,19 @@
-// TODO: Узнать как правильно типизировать то что возвращает fetch.
+import type { TodosData, Todo } from '../types/types';
 
-export async function fetchItems(category: string) {
+
+
+const baseUrl: string = 'https://easydev.club/api/v1/todos';
+
+
+export async function fetchItems(category: string): Promise<TodosData | string> {
 
     const params = {
         filter: category
     };
     const queryParams = new URLSearchParams(params);
 
-    const response = await fetch(`https://easydev.club/api/v1/todos?${queryParams}`);
-    const resData: unknown = await response.json();
+    const response = await fetch(`${baseUrl}?${queryParams}`);
+    const resData = await response.json();
     if (!response.ok) {
         throw new Error('Не удалось получить записи списка задач по категории');
     }
@@ -18,32 +23,32 @@ export async function fetchItems(category: string) {
 
 
 // TODO изучить что такое .then
-export async function createNewItem(title: string) {
+export async function createNewItem(title: string): Promise<Todo | string> {
     const newItem = { isDone: false, title: title };
-    const response = await fetch('https://easydev.club/api/v1/todos', {
+    const response = await fetch(baseUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(newItem)
     });
-    const resData: unknown = await response.json();
+    const resData = await response.json();
     if (!response.ok) {
         throw new Error('Не удалось создать новую задачу');
     }
     return resData;
 }
 
-export async function editItem(id: number, status: boolean, title: string) {
+export async function editItem(id: number, status: boolean, title: string): Promise<Todo | string> {
     const editedItem = { isDone: status, title: title };
-    const response = await fetch(`https://easydev.club/api/v1/todos/${id}`, {
+    const response = await fetch(`${baseUrl}/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(editedItem)
     });
-    const resData: unknown = await response.json();
+    const resData = await response.json();
     if (!response.ok) {
         throw new Error('Не удалось отредактировать запись');
     }
@@ -51,16 +56,19 @@ export async function editItem(id: number, status: boolean, title: string) {
 }
 
 
-export async function deleteItem(id: number) {
-    const response = await fetch(`https://easydev.club/api/v1/todos/${id}`, {
+export async function deleteItem(id: number): Promise<string> {
+    const response = await fetch(`${baseUrl}/${id}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
         },
     });
+
+    const resData = await response.json();
     if (!response.ok) {
         throw new Error('Не удалось удалить запись');
     }
-    return response;
+
+    return resData;
 }
 

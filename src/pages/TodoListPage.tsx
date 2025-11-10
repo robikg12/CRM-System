@@ -12,11 +12,14 @@ import { fetchItems } from "../api/https";
 const TodoListPage: React.FC = () => {
 
     const [todosData, setTodosData] = useState<TodosData>({
-        todos: [],
-        counts: {
+        data: [],
+        info: {
             all: null,
             inWork: null,
             completed: null
+        },
+        meta: {
+            totalAmount: 0
         }
     });
     const [currentCategory, setCurrentCategory] = useState<string>('all');
@@ -31,32 +34,16 @@ const TodoListPage: React.FC = () => {
 
 
 
-    async function refreshData(category?: string) {
+    async function refreshData(category: string = currentCategory) {
         try {
-            const responseData = await fetchItems(category ?? currentCategory);
+            const responseData = await fetchItems(category);
 
             // Дааа... Что-то явно идёт не так
-            if (responseData &&
-                typeof responseData === 'object' &&
-                "data" in responseData && "info" in responseData &&
-                Array.isArray(responseData.data) &&
-                (responseData.data.length === 0 || ("created" in responseData.data[0] && "id" in responseData.data[0] && "isDone" in responseData.data[0] && "title" in responseData.data[0])) &&
-                responseData.info &&
-                typeof responseData.info === 'object' &&
-                ("all" in responseData.info && "completed" in responseData.info && "inWork" in responseData.info) &&
-                (typeof responseData.info.all === 'number' && typeof responseData.info.inWork === 'number' && typeof responseData.info.completed === 'number')
-            ) {
-                setTodosData({
-                    todos: responseData.data,
-                    counts: {
-                        all: responseData.info.all,
-                        completed: responseData.info.completed,
-                        inWork: responseData.info.inWork
-                    }
-                });
+            if (typeof responseData === 'object') {
+                setTodosData(responseData);
             }
             else {
-                alert('Произошла ошибка связанная с серверной составляющей сайта.');
+                alert(`Произошла ошибка связанная с серверной составляющей сайта. ${responseData}`);
             }
 
         }
@@ -92,7 +79,7 @@ const TodoListPage: React.FC = () => {
             <div className="wrapperOfAllList">
                 <TodoFilter
                     currentCategory={currentCategory}
-                    todosData={todosData}
+                    counts={todosData.info}
                     handleSelectCategory={handleSelectCategory}
                 />
 

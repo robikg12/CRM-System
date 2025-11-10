@@ -3,16 +3,21 @@ import { createNewItem } from '../../api/https'
 import { titleValidation } from '../../validation';
 
 
-// TODO: Посмотреть должен ли я заносить типы в отдельный файл
+
 import type { Status } from '../../types/types';
 
 import classes from './AddTodo.module.css';
 
-// TODO: Разобраться, показывает что category string | undefined - undefined смущает.
+
 const AddTodo: React.FC<{
+    // Всё таки в дочернем компоненте я оставил category? Т.к например в функциях редактирования, добавиления записи и т.д -
+    //  я заново получаю с сервера данные, а в запросе нужна категория. И например если я в категории "В работе", то
+    //  чтобы при изменении записи не открывалась категория "все". В родительском компоненте в функции убрал category?
+    //  и заменил вопросительный знак на значение по умолчанию, но в дочернем он мне не даёт, даже если я указал в
+    //  родительском значение по умолчанию выполнить функцию без параметра.
     refreshData: (category?: string) => Promise<void>;
     recordError(error: Status): void
-}> = (props) => {
+}> = ({ refreshData, recordError }) => {
 
 
     const [title, setTitle] = useState<string>('');
@@ -25,11 +30,11 @@ const AddTodo: React.FC<{
 
         event.preventDefault();
         const validationInfo = titleValidation(title);
-        props.recordError(validationInfo);
+        recordError(validationInfo);
         if (validationInfo.isValid) {
             try {
                 await createNewItem(title);
-                await props.refreshData();
+                await refreshData();
                 setTitle('');
             }
             catch (error) {

@@ -10,25 +10,18 @@ const TodosList: React.FC<{
     refreshData: (category?: string) => Promise<void>;
     recordError: (error: Status) => void;
 
-}> = (props) => {
+}> = ({ todosData, refreshData, isLoading, recordError }) => {
 
 
     return (
         <>
-            {props.isLoading && <p className={classes.lodaingText}>Загрузочка...</p>}
-            {(!props.isLoading) && <ul className={classes.list}> {(props.todosData.todos.map((todo) => {
+            {isLoading && <p className={classes.lodaingText}>Загрузочка...</p>}
+            {(!isLoading) && <ul className={classes.list}> {(todosData.data.map((todo) => {
                 return <TodoItem key={todo.id}
-                    // title={todo.title}
-                    // isDone={todo.isDone}
-                    // itemId={todo.id}
-
-                    // Раньше я передавал информацию о туду через код который закоментирован выше, но сейчас когда переписывал на TS посчитал так,
-                    // что правильнее будет передать целиком .map объект todo, чтобы в дочернем компоненте не прописывать каждому свойству типы, чтобы это было как бы единое целое, но, может я не прав.
-
 
                     todo={todo}
-                    recordError={props.recordError}
-                    refreshData={props.refreshData}
+                    recordError={recordError}
+                    refreshData={refreshData}
                 />
             }))}</ul>
             }

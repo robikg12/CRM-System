@@ -17,12 +17,12 @@ const TodoItem: React.FC<{
     todo: Todo;
     refreshData: (category?: string) => Promise<void>;
     recordError: (error: Status) => void;
-}> = (props) => {
+}> = ({ todo, recordError, refreshData }) => {
 
     // function TodoItem({ isDone, title, itemId, setError, refreshData }) {
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [editedTitle, setEditedTitle] = useState<string>(props.todo.title);
+    const [editedTitle, setEditedTitle] = useState<string>(todo.title);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
 
@@ -30,8 +30,8 @@ const TodoItem: React.FC<{
         try {
             setIsLoading(true);
             const newStatus = event.target.checked;
-            await editItem(props.todo.id, newStatus, props.todo.title);
-            await props.refreshData();
+            await editItem(todo.id, newStatus, todo.title);
+            await refreshData();
             setIsLoading(false);
         }
         catch (error) {
@@ -51,12 +51,12 @@ const TodoItem: React.FC<{
 
     async function handleSave() {
         const validationInfo = titleValidation(editedTitle);
-        props.recordError(validationInfo);
+        recordError(validationInfo);
         if (validationInfo.isValid) {
             try {
                 setIsLoading(true);
-                await editItem(props.todo.id, props.todo.isDone, editedTitle);
-                await props.refreshData();
+                await editItem(todo.id, todo.isDone, editedTitle);
+                await refreshData();
                 setIsLoading(false);
                 setIsEditing(false);
             }
@@ -68,16 +68,16 @@ const TodoItem: React.FC<{
 
     function handleCancel() {
         setIsEditing(false);
-        setEditedTitle(props.todo.title);
-        props.recordError({ isValid: true, message: '' })
+        setEditedTitle(todo.title);
+        recordError({ isValid: true, message: '' })
     }
 
     async function handleDelete() {
 
         try {
             setIsLoading(true);
-            await deleteItem(props.todo.id);
-            await props.refreshData();
+            await deleteItem(todo.id);
+            await refreshData();
             setIsLoading(false);
         }
         catch (error) {
@@ -85,15 +85,15 @@ const TodoItem: React.FC<{
         }
     }
 
-    let titleElement = <p className={`${classes.itemInputText} ${props.todo.isDone ? classes.isDone : ''}`}>{props.todo.title}</p>;
+    let titleElement = <p className={`${classes.itemInputText} ${todo.isDone ? classes.isDone : ''}`}>{todo.title}</p>;
     if (isLoading) {
         titleElement = <p className={`${classes.itemInputText} ${classes.blue}`}>Загрузочка...</p>
     }
     return (
         <li className={classes.item}>
-            <input type="checkbox" className={classes.checkbox} checked={props.todo.isDone} onChange={handleEditStatus} />
+            <input type="checkbox" className={classes.checkbox} checked={todo.isDone} onChange={handleEditStatus} />
 
-            {isEditing ? <input className={`${classes.itemInputText} ${props.todo.isDone ? classes.isDone : ''}`} value={editedTitle} onChange={handleChangeTitleText} /> :
+            {isEditing ? <input className={`${classes.itemInputText} ${todo.isDone ? classes.isDone : ''}`} value={editedTitle} onChange={handleChangeTitleText} /> :
                 titleElement}
 
             {isEditing ? <button className={classes.saveBtn} onClick={handleSave}><SaveIcon className={classes.itemIcon} /></button> :

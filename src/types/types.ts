@@ -6,6 +6,8 @@ export type Todo = {
     isDone: boolean;
     title: string;
 }
+
+//Вынужден оставить | null
 export type ItemCount = {
     all: number | null;
     completed: number | null;
@@ -13,8 +15,11 @@ export type ItemCount = {
 }
 
 export type TodosData = {
-    todos: Todo[];
-    counts: ItemCount;
+    data: Todo[];
+    info: ItemCount;
+    meta: {
+        totalAmount: number;
+    }
 }
 
 
