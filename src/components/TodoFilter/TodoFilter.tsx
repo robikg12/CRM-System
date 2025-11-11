@@ -13,15 +13,15 @@ const TodoFilter: React.FC<{
             <ul className={classes.menu}>
                 <li className={`${classes.menuItem} ${currentCategory === 'all' ? classes.selected : ''}`}
                     onClick={() => handleSelectCategory('all')}>
-                    Все {counts.all && `(${counts.all})`}
+                    Все {`(${counts.all})`}
                 </li>
                 <li className={`${classes.menuItem} ${currentCategory === 'inWork' ? classes.selected : ''}`}
                     onClick={() => handleSelectCategory('inWork')}>
-                    в работе {counts.inWork && `(${counts.inWork})`}
+                    в работе {`(${counts.inWork})`}
                 </li>
                 <li className={`${classes.menuItem} ${currentCategory === 'completed' ? classes.selected : ''}`}
                     onClick={() => handleSelectCategory('completed')}>
-                    сделано {counts.completed && `(${counts.completed})`}
+                    сделано {`(${counts.completed})`}
                 </li>
             </ul >
         </nav>

@@ -9,9 +9,9 @@ export type Todo = {
 
 //Вынужден оставить | null
 export type ItemCount = {
-    all: number | null;
-    completed: number | null;
-    inWork: number | null;
+    all: number;
+    completed: number;
+    inWork: number;
 }
 
 export type TodosData = {

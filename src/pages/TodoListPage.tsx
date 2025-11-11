@@ -14,9 +14,9 @@ const TodoListPage: React.FC = () => {
     const [todosData, setTodosData] = useState<TodosData>({
         data: [],
         info: {
-            all: null,
-            inWork: null,
-            completed: null
+            all: 0,
+            inWork: 0,
+            completed: 0
         },
         meta: {
             totalAmount: 0
@@ -38,7 +38,7 @@ const TodoListPage: React.FC = () => {
         try {
             const responseData = await fetchItems(category);
 
-            // Дааа... Что-то явно идёт не так
+
             if (typeof responseData === 'object') {
                 setTodosData(responseData);
             }
@@ -52,10 +52,6 @@ const TodoListPage: React.FC = () => {
         }
     }
 
-    // Раньше state-функцию setError я передавал напрямую, без обёртывания в другую функцию, но 
-    // теперь при TS я кажется понял, что если передам напрямую в другой компонент setError, то в дочернем
-    // компоненте при указании типа этого пропса придётся указывать длинный непонятный тип, и видимо такой
-    // подход в TS не распростанён.
 
     function recordError(error: Status) {
         setError(error);
