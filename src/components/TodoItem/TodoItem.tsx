@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { editItem, deleteItem } from '../../api/https';
 import { titleValidation } from '../../validation';
 
-import type { Todo, Status } from '../../types/types';
+import type { Todo, Status, TodoRequest } from '../../types/types';
 
 import CancelIcon from "../../assets/img/icons/cancel.svg?react";
 import EditIcon from "../../assets/img/icons/note.svg?react";
@@ -15,11 +15,11 @@ import classes from './TodoItem.module.css';
 
 const TodoItem: React.FC<{
     todo: Todo;
-    refreshData: (category?: string) => Promise<void>;
+    refreshData: () => Promise<void>;
     recordError: (error: Status) => void;
 }> = ({ todo, recordError, refreshData }) => {
 
-    // function TodoItem({ isDone, title, itemId, setError, refreshData }) {
+
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [editedTitle, setEditedTitle] = useState<string>(todo.title);
@@ -30,7 +30,8 @@ const TodoItem: React.FC<{
         try {
             setIsLoading(true);
             const newStatus = event.target.checked;
-            await editItem(todo.id, newStatus, todo.title);
+            const todoRequest: TodoRequest = { isDone: newStatus, title: todo.title };
+            await editItem(todo.id, todoRequest);
             await refreshData();
             setIsLoading(false);
         }
@@ -55,7 +56,8 @@ const TodoItem: React.FC<{
         if (validationInfo.isValid) {
             try {
                 setIsLoading(true);
-                await editItem(todo.id, todo.isDone, editedTitle);
+                const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
+                await editItem(todo.id, todoRequest);
                 await refreshData();
                 setIsLoading(false);
                 setIsEditing(false);

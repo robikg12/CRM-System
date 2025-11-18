@@ -1,13 +1,14 @@
 import classes from './TodoFilter.module.css';
 
-import type { ItemCount } from '../../types/types';
+import type { TodoInfo, Category } from '../../types/types';
 
 const TodoFilter: React.FC<{
-    currentCategory: string;
-    counts: ItemCount;
-    handleSelectCategory: (category: string) => Promise<void>
+    currentCategory: Category;
+    counts: TodoInfo;
+    handleSelectCategory: (category: Category) => Promise<void>
 }> = ({ currentCategory, counts, handleSelectCategory }) => {
 
+    
     return (
         <nav>
             <ul className={classes.menu}>

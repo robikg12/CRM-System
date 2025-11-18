@@ -4,7 +4,7 @@ import { titleValidation } from '../../validation';
 
 
 
-import type { Status } from '../../types/types';
+import type { Status, TodoRequest } from '../../types/types';
 
 import classes from './AddTodo.module.css';
 
@@ -15,7 +15,7 @@ const AddTodo: React.FC<{
     //  чтобы при изменении записи не открывалась категория "все". В родительском компоненте в функции убрал category?
     //  и заменил вопросительный знак на значение по умолчанию, но в дочернем он мне не даёт, даже если я указал в
     //  родительском значение по умолчанию выполнить функцию без параметра.
-    refreshData: (category?: string) => Promise<void>;
+    refreshData: () => Promise<void>;
     recordError(error: Status): void
 }> = ({ refreshData, recordError }) => {
 
@@ -32,8 +32,9 @@ const AddTodo: React.FC<{
         const validationInfo = titleValidation(title);
         recordError(validationInfo);
         if (validationInfo.isValid) {
+            const todoRequest: TodoRequest = { isDone: false, title: title }
             try {
-                await createNewItem(title);
+                await createNewItem(todoRequest);
                 await refreshData();
                 setTitle('');
             }

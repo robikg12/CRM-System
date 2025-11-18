@@ -2,16 +2,16 @@ import AddTodo from '../components/AddTodo/AddTodo';
 import TodoFilter from '../components/TodoFilter/TodoFilter';
 import TodosList from '../components/TodosList/TodosList'
 
-import type { Status, TodosData } from '../types/types';
+import type { Todo, TodoInfo, MetaResponse, Status, Category } from '../types/types';
 
 import { useState, useEffect } from "react";
-import { fetchItems } from "../api/https";
+import { fetchTodosData } from "../api/https";
 
 
 
 const TodoListPage: React.FC = () => {
 
-    const [todosData, setTodosData] = useState<TodosData>({
+    const [todosData, setTodosData] = useState<MetaResponse<Todo, TodoInfo>>({
         data: [],
         info: {
             all: 0,
@@ -22,29 +22,22 @@ const TodoListPage: React.FC = () => {
             totalAmount: 0
         }
     });
-    const [currentCategory, setCurrentCategory] = useState<string>('all');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [currentCategory, setCurrentCategory] = useState<Category>('all');
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Status>({ isValid: true, message: '' });
 
 
-    async function handleSelectCategory(category: string) {
+    async function handleSelectCategory(category: Category) {
         setCurrentCategory(category);
-        await refreshData(category);
     }
 
 
 
-    async function refreshData(category: string = currentCategory) {
+    async function refreshData() {
         try {
-            const responseData = await fetchItems(category);
+            const responseData = await fetchTodosData(currentCategory);
+            setTodosData(responseData);
 
-
-            if (typeof responseData === 'object') {
-                setTodosData(responseData);
-            }
-            else {
-                alert(`Произошла ошибка связанная с серверной составляющей сайта. ${responseData}`);
-            }
 
         }
         catch (error) {
@@ -61,29 +54,31 @@ const TodoListPage: React.FC = () => {
 
     useEffect(() => {
         (async function () {
-            setIsLoading(true);
-            await refreshData(currentCategory);
+            await refreshData();
             setIsLoading(false);
         })();
 
-    }, []);
+    }, [currentCategory]);
 
     return (
         <div className="wrapper">
             <AddTodo refreshData={refreshData} recordError={recordError} />
             {!error.isValid && <div className="errorBlock">{error.message}</div>}
             <div className="wrapperOfAllList">
-                <TodoFilter
+
+                {todosData.info && <TodoFilter
                     currentCategory={currentCategory}
                     counts={todosData.info}
                     handleSelectCategory={handleSelectCategory}
                 />
-
-                <TodosList
-                    todosData={todosData}
-                    refreshData={refreshData}
-                    isLoading={isLoading}
-                    recordError={recordError} />
+                }
+                {todosData.info &&
+                    <TodosList
+                        todosData={todosData}
+                        refreshData={refreshData}
+                        isLoading={isLoading}
+                        recordError={recordError} />
+                }
             </div>
         </div>
     )

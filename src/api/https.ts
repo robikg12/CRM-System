@@ -1,11 +1,11 @@
-import type { TodosData, Todo } from '../types/types';
+import type { MetaResponse, Todo, Category, TodoInfo, TodoRequest } from '../types/types';
 
 
 
 const baseUrl: string = 'https://easydev.club/api/v1/todos';
 
 
-export async function fetchItems(category: string): Promise<TodosData | string> {
+export async function fetchTodosData(category: Category): Promise<MetaResponse<Todo, TodoInfo> | never> {
 
     const params = {
         filter: category
@@ -23,14 +23,14 @@ export async function fetchItems(category: string): Promise<TodosData | string> 
 
 
 // TODO изучить что такое .then
-export async function createNewItem(title: string): Promise<Todo | string> {
-    const newItem = { isDone: false, title: title };
+export async function createNewItem(todoRequest: TodoRequest): Promise<Todo | never> {
+
     const response = await fetch(baseUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newItem)
+        body: JSON.stringify(todoRequest)
     });
     const resData = await response.json();
     if (!response.ok) {
@@ -39,14 +39,14 @@ export async function createNewItem(title: string): Promise<Todo | string> {
     return resData;
 }
 
-export async function editItem(id: number, status: boolean, title: string): Promise<Todo | string> {
-    const editedItem = { isDone: status, title: title };
+export async function editItem(id: number, todoRequest: TodoRequest): Promise<Todo | never> {
+
     const response = await fetch(`${baseUrl}/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(editedItem)
+        body: JSON.stringify(todoRequest)
     });
     const resData = await response.json();
     if (!response.ok) {
@@ -56,7 +56,7 @@ export async function editItem(id: number, status: boolean, title: string): Prom
 }
 
 
-export async function deleteItem(id: number) {
+export async function deleteItem(id: number): Promise<Response | never> {
     const response = await fetch(`${baseUrl}/${id}`, {
         method: 'DELETE',
         headers: {

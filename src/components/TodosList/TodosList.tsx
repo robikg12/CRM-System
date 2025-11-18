@@ -2,12 +2,12 @@ import TodoItem from '../TodoItem/TodoItem';
 
 import classes from './TodosList.module.css';
 
-import type { TodosData, Status } from '../../types/types';
+import type { Todo, TodoInfo, MetaResponse, Status } from '../../types/types';
 
 const TodosList: React.FC<{
-    todosData: TodosData;
+    todosData: MetaResponse<Todo, TodoInfo>;
     isLoading: boolean;
-    refreshData: (category?: string) => Promise<void>;
+    refreshData: () => Promise<void>;
     recordError: (error: Status) => void;
 
 }> = ({ todosData, refreshData, isLoading, recordError }) => {
