@@ -2,25 +2,35 @@ import { useState } from 'react';
 import { createNewItem } from '../../api/https'
 import { titleValidation } from '../../validation';
 
+
+
+import type { Status, TodoRequest } from '../../types/types';
+
 import classes from './AddTodo.module.css';
 
 
-function AddTodo({ setError, refreshData }) {
+const AddTodo: React.FC<{
 
-    const [title, setTitle] = useState('');
+    refreshData: () => Promise<void>;
+    recordError(error: Status): void
+}> = ({ refreshData, recordError }) => {
 
-    function handleChangeTitle(event) {
+
+    const [title, setTitle] = useState<string>('');
+
+    function handleChangeTitle(event: React.ChangeEvent<HTMLInputElement>) {
         setTitle(event.target.value);
     }
 
-    async function handleAddItem(event) {
+    async function handleAddItem(event: React.FormEvent) {
 
         event.preventDefault();
         const validationInfo = titleValidation(title);
-        setError(validationInfo);
+        recordError(validationInfo);
         if (validationInfo.isValid) {
+            const todoRequest: TodoRequest = { isDone: false, title: title }
             try {
-                await createNewItem(title);
+                await createNewItem(todoRequest);
                 await refreshData();
                 setTitle('');
             }
@@ -39,4 +49,4 @@ function AddTodo({ setError, refreshData }) {
     );
 }
 
-export default AddTodo
+export default AddTodo;

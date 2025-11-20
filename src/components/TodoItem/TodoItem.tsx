@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { editItem, deleteItem } from '../../api/https';
 import { titleValidation } from '../../validation';
+
+import type { Todo, Status, TodoRequest } from '../../types/types';
 
 import CancelIcon from "../../assets/img/icons/cancel.svg?react";
 import EditIcon from "../../assets/img/icons/note.svg?react";
@@ -10,18 +12,26 @@ import DeleteIcon from "../../assets/img/icons/trash.svg?react";
 import classes from './TodoItem.module.css';
 
 
-function TodoItem({ isDone, title, itemId, setError, refreshData }) {
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedTitle, setEditedTitle] = useState(title);
-    const [isLoading, setIsLoading] = useState(false);
+const TodoItem: React.FC<{
+    todo: Todo;
+    refreshData: () => Promise<void>;
+    recordError: (error: Status) => void;
+}> = ({ todo, recordError, refreshData }) => {
 
 
-    async function handleEditStatus(event) {
+
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [editedTitle, setEditedTitle] = useState<string>(todo.title);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+
+    async function handleEditStatus(event: React.ChangeEvent<HTMLInputElement>) {
         try {
             setIsLoading(true);
             const newStatus = event.target.checked;
-            await editItem(itemId, newStatus, title);
+            const todoRequest: TodoRequest = { isDone: newStatus, title: todo.title };
+            await editItem(todo.id, todoRequest);
             await refreshData();
             setIsLoading(false);
         }
@@ -31,7 +41,7 @@ function TodoItem({ isDone, title, itemId, setError, refreshData }) {
 
     }
 
-    function handleChangeTitleText(event) {
+    function handleChangeTitleText(event: React.ChangeEvent<HTMLInputElement>) {
         setEditedTitle(event.target.value);
     }
 
@@ -42,11 +52,12 @@ function TodoItem({ isDone, title, itemId, setError, refreshData }) {
 
     async function handleSave() {
         const validationInfo = titleValidation(editedTitle);
-        setError(validationInfo);
+        recordError(validationInfo);
         if (validationInfo.isValid) {
             try {
                 setIsLoading(true);
-                await editItem(itemId, isDone, editedTitle);
+                const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
+                await editItem(todo.id, todoRequest);
                 await refreshData();
                 setIsLoading(false);
                 setIsEditing(false);
@@ -59,15 +70,15 @@ function TodoItem({ isDone, title, itemId, setError, refreshData }) {
 
     function handleCancel() {
         setIsEditing(false);
-        setEditedTitle(title);
-        setError({ isValid: true, message: '' })
+        setEditedTitle(todo.title);
+        recordError({ isValid: true, message: '' })
     }
 
     async function handleDelete() {
 
         try {
             setIsLoading(true);
-            await deleteItem(itemId);
+            await deleteItem(todo.id);
             await refreshData();
             setIsLoading(false);
         }
@@ -76,15 +87,15 @@ function TodoItem({ isDone, title, itemId, setError, refreshData }) {
         }
     }
 
-    let titleElement = <p className={`${classes.itemInputText} ${isDone ? classes.isDone : ''}`}>{title}</p>;
+    let titleElement = <p className={`${classes.itemInputText} ${todo.isDone ? classes.isDone : ''}`}>{todo.title}</p>;
     if (isLoading) {
         titleElement = <p className={`${classes.itemInputText} ${classes.blue}`}>Загрузочка...</p>
     }
     return (
         <li className={classes.item}>
-            <input type="checkbox" className={classes.checkbox} checked={isDone} onChange={handleEditStatus} />
+            <input type="checkbox" className={classes.checkbox} checked={todo.isDone} onChange={handleEditStatus} />
 
-            {isEditing ? <input className={`${classes.itemInputText} ${isDone ? classes.isDone : ''}`} value={editedTitle} onChange={handleChangeTitleText} /> :
+            {isEditing ? <input className={`${classes.itemInputText} ${todo.isDone ? classes.isDone : ''}`} value={editedTitle} onChange={handleChangeTitleText} /> :
                 titleElement}
 
             {isEditing ? <button className={classes.saveBtn} onClick={handleSave}><SaveIcon className={classes.itemIcon} /></button> :

@@ -1,29 +1,36 @@
-export async function fetchItems(category) {
+import type { MetaResponse, Todo, Category, TodoInfo, TodoRequest } from '../types/types';
+
+
+
+const baseUrl: string = 'https://easydev.club/api/v1/todos';
+
+
+export async function fetchTodosData(category: Category): Promise<MetaResponse<Todo, TodoInfo>> {
 
     const params = {
         filter: category
     };
     const queryParams = new URLSearchParams(params);
 
-    const response = await fetch(`https://easydev.club/api/v1/todos?${queryParams}`);
+    const response = await fetch(`${baseUrl}?${queryParams}`);
     const resData = await response.json();
     if (!response.ok) {
         throw new Error('Не удалось получить записи списка задач по категории');
     }
 
     return resData;
-
 }
 
+
 // TODO изучить что такое .then
-export async function createNewItem(title) {
-    const newItem = { isDone: false, title: title };
-    const response = await fetch('https://easydev.club/api/v1/todos', {
+export async function createNewItem(todoRequest: TodoRequest): Promise<Todo> {
+
+    const response = await fetch(baseUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newItem)
+        body: JSON.stringify(todoRequest)
     });
     const resData = await response.json();
     if (!response.ok) {
@@ -32,14 +39,14 @@ export async function createNewItem(title) {
     return resData;
 }
 
-export async function editItem(id, status, title) {
-    const editedItem = { isDone: status, title: title };
-    const response = await fetch(`https://easydev.club/api/v1/todos/${id}`, {
+export async function editItem(id: number, todoRequest: TodoRequest): Promise<Todo> {
+
+    const response = await fetch(`${baseUrl}/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(editedItem)
+        body: JSON.stringify(todoRequest)
     });
     const resData = await response.json();
     if (!response.ok) {
@@ -49,16 +56,19 @@ export async function editItem(id, status, title) {
 }
 
 
-export async function deleteItem(id) {
-    const response = await fetch(`https://easydev.club/api/v1/todos/${id}`, {
+export async function deleteItem(id: number): Promise<Response> {
+    const response = await fetch(`${baseUrl}/${id}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
         },
     });
+
+
     if (!response.ok) {
         throw new Error('Не удалось удалить запись');
     }
+
     return response;
 }
 
