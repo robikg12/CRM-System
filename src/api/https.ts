@@ -5,7 +5,7 @@ import type { MetaResponse, Todo, Category, TodoInfo, TodoRequest } from '../typ
 const baseUrl: string = 'https://easydev.club/api/v1/todos';
 
 
-export async function fetchTodosData(category: Category): Promise<MetaResponse<Todo, TodoInfo> | never> {
+export async function fetchTodosData(category: Category): Promise<MetaResponse<Todo, TodoInfo>> {
 
     const params = {
         filter: category
@@ -23,7 +23,7 @@ export async function fetchTodosData(category: Category): Promise<MetaResponse<T
 
 
 // TODO изучить что такое .then
-export async function createNewItem(todoRequest: TodoRequest): Promise<Todo | never> {
+export async function createNewItem(todoRequest: TodoRequest): Promise<Todo> {
 
     const response = await fetch(baseUrl, {
         method: 'POST',
@@ -39,7 +39,7 @@ export async function createNewItem(todoRequest: TodoRequest): Promise<Todo | ne
     return resData;
 }
 
-export async function editItem(id: number, todoRequest: TodoRequest): Promise<Todo | never> {
+export async function editItem(id: number, todoRequest: TodoRequest): Promise<Todo> {
 
     const response = await fetch(`${baseUrl}/${id}`, {
         method: 'PUT',
@@ -56,7 +56,7 @@ export async function editItem(id: number, todoRequest: TodoRequest): Promise<To
 }
 
 
-export async function deleteItem(id: number): Promise<Response | never> {
+export async function deleteItem(id: number): Promise<Response> {
     const response = await fetch(`${baseUrl}/${id}`, {
         method: 'DELETE',
         headers: {
