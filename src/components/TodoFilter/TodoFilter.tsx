@@ -1,31 +1,39 @@
-import classes from './TodoFilter.module.css';
-
 import type { TodoInfo, Category } from '../../types/types';
+
+import { Tabs } from 'antd';
+import type { TabsProps } from 'antd';
+
 
 const TodoFilter: React.FC<{
     currentCategory: Category;
     counts: TodoInfo;
     handleSelectCategory: (category: Category) => Promise<void>
-}> = ({ currentCategory, counts, handleSelectCategory }) => {
+}> = ({ counts, handleSelectCategory }) => {
 
-    
+    const onChange = (key: string) => {
+        if (key === 'all' || key === 'inWork' || key === 'completed')
+            handleSelectCategory(key);
+    };
+
+    const items: TabsProps['items'] = [
+        {
+            key: 'all',
+            label: `Все (${counts.all})`,
+        },
+        {
+            key: 'inWork',
+            label: `В работе ${counts.inWork}`,
+        },
+        {
+            key: 'completed',
+            label: `сделано ${counts.completed}`,
+        },
+    ];
+
     return (
-        <nav>
-            <ul className={classes.menu}>
-                <li className={`${classes.menuItem} ${currentCategory === 'all' ? classes.selected : ''}`}
-                    onClick={() => handleSelectCategory('all')}>
-                    Все {`(${counts.all})`}
-                </li>
-                <li className={`${classes.menuItem} ${currentCategory === 'inWork' ? classes.selected : ''}`}
-                    onClick={() => handleSelectCategory('inWork')}>
-                    в работе {`(${counts.inWork})`}
-                </li>
-                <li className={`${classes.menuItem} ${currentCategory === 'completed' ? classes.selected : ''}`}
-                    onClick={() => handleSelectCategory('completed')}>
-                    сделано {`(${counts.completed})`}
-                </li>
-            </ul >
-        </nav>
+
+        <Tabs defaultActiveKey="all" items={items} onChange={onChange} />
+        
     );
 }
 

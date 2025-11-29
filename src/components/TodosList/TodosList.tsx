@@ -2,25 +2,25 @@ import TodoItem from '../TodoItem/TodoItem';
 
 import classes from './TodosList.module.css';
 
-import type { Todo, TodoInfo, MetaResponse, Status } from '../../types/types';
+import type { Todo, TodoInfo, MetaResponse } from '../../types/types';
 
 const TodosList: React.FC<{
     todosData: MetaResponse<Todo, TodoInfo>;
     isLoading: boolean;
     refreshData: () => Promise<void>;
-    recordError: (error: Status) => void;
 
-}> = ({ todosData, refreshData, isLoading, recordError }) => {
+}> = ({ todosData, refreshData, isLoading }) => {
 
 
     return (
         <>
+            {/* Тут немного схалтурил, не стал добавлять antd на этом компоненте 
+                так как элементы простые, да и посмотрел, компонент List в antd
+                написано, что устарел. Надеюсь прокатит */}
             {isLoading && <p className={classes.lodaingText}>Загрузочка...</p>}
             {(!isLoading) && <ul className={classes.list}> {(todosData.data.map((todo) => {
                 return <TodoItem key={todo.id}
-
                     todo={todo}
-                    recordError={recordError}
                     refreshData={refreshData}
                 />
             }))}</ul>

@@ -1,11 +1,3 @@
-
-
-
-export type Status = {
-    isValid: boolean;
-    message: string;
-}
-
 export type Category = 'all' | 'completed' | 'inWork';
 
 

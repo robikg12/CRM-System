@@ -1,51 +1,44 @@
-import { useState } from 'react';
 import { createNewItem } from '../../api/https'
-import { titleValidation } from '../../validation';
+import type { TodoRequest } from '../../types/types';
 
+import { Button, Form, Input, Flex } from 'antd';
 
+import type { FormProps } from 'antd';
 
-import type { Status, TodoRequest } from '../../types/types';
-
-import classes from './AddTodo.module.css';
-
+type FieldType = {
+    title?: string;
+}
 
 const AddTodo: React.FC<{
 
     refreshData: () => Promise<void>;
-    recordError(error: Status): void
-}> = ({ refreshData, recordError }) => {
+}> = ({ refreshData }) => {
 
+    const [form] = Form.useForm(); //К этой строчке дошёл не самостоятельно.
 
-    const [title, setTitle] = useState<string>('');
-
-    function handleChangeTitle(event: React.ChangeEvent<HTMLInputElement>) {
-        setTitle(event.target.value);
-    }
-
-    async function handleAddItem(event: React.FormEvent) {
-
-        event.preventDefault();
-        const validationInfo = titleValidation(title);
-        recordError(validationInfo);
-        if (validationInfo.isValid) {
-            const todoRequest: TodoRequest = { isDone: false, title: title }
-            try {
-                await createNewItem(todoRequest);
-                await refreshData();
-                setTitle('');
-            }
-            catch (error) {
-                alert(`Не получилось создать запись. Ошибка ${error}`);
-            }
+    const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+        const todoRequest: TodoRequest = { isDone: false, title: values.title }
+        try {
+            await createNewItem(todoRequest);
+            await refreshData();
+            form.resetFields();
+        }
+        catch (error) {
+            alert(`Не получилось создать запись. Ошибка ${error}`);
         }
     }
 
     return (
-        // загуглил про onSubmit
-        <form onSubmit={handleAddItem} className={classes.wrapperInterface}>
-            <input className={classes.input} type="text" placeholder='Нужно сделать...' value={title} onChange={handleChangeTitle} />
-            <button type="submit" className={classes.button}>Add</button>
-        </form>
+        <Form form={form} onFinish={onFinish} >
+            <Flex gap="middle" align='center'>
+                <Form.Item name="title" rules={[{ required: true, message: 'Введите задачу' }, { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}>
+                    <Input placeholder='Нужно сделать...' size='large' style={{width: '415px'}}/>
+                </Form.Item>
+                <Form.Item >
+                    <Button type="primary" htmlType="submit">Add</Button>
+                </Form.Item>
+            </Flex>
+        </Form>
     );
 }
 

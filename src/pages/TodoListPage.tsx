@@ -2,12 +2,10 @@ import AddTodo from '../components/AddTodo/AddTodo';
 import TodoFilter from '../components/TodoFilter/TodoFilter';
 import TodosList from '../components/TodosList/TodosList'
 
-import type { Todo, TodoInfo, MetaResponse, Status, Category } from '../types/types';
+import type { Todo, TodoInfo, MetaResponse, Category } from '../types/types';
 
 import { useState, useEffect } from "react";
 import { fetchTodosData } from "../api/https";
-
-
 
 const TodoListPage: React.FC = () => {
 
@@ -24,7 +22,6 @@ const TodoListPage: React.FC = () => {
     });
     const [currentCategory, setCurrentCategory] = useState<Category>('all');
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<Status>({ isValid: true, message: '' });
 
 
     async function handleSelectCategory(category: Category) {
@@ -32,25 +29,15 @@ const TodoListPage: React.FC = () => {
     }
 
 
-
     async function refreshData() {
         try {
             const responseData = await fetchTodosData(currentCategory);
             setTodosData(responseData);
-
-
         }
         catch (error) {
             alert(`Не удалось получить записи${error}`);
         }
     }
-
-
-    function recordError(error: Status) {
-        setError(error);
-    }
-
-
 
     useEffect(() => {
         (async function () {
@@ -58,12 +45,15 @@ const TodoListPage: React.FC = () => {
             setIsLoading(false);
         })();
 
+        const intervalId = setInterval(refreshData, 5000);
+        return () => clearInterval(intervalId); //Про вот эту вот штуку - загуглил.
     }, [currentCategory]);
+
+
 
     return (
         <div className="wrapper">
-            <AddTodo refreshData={refreshData} recordError={recordError} />
-            {!error.isValid && <div className="errorBlock">{error.message}</div>}
+            <AddTodo refreshData={refreshData} />
             <div className="wrapperOfAllList">
 
                 {todosData.info && <TodoFilter
@@ -77,7 +67,7 @@ const TodoListPage: React.FC = () => {
                         todosData={todosData}
                         refreshData={refreshData}
                         isLoading={isLoading}
-                        recordError={recordError} />
+                    />
                 }
             </div>
         </div>

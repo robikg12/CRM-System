@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
 import { editItem, deleteItem } from '../../api/https';
-import { titleValidation } from '../../validation';
 
-import type { Todo, Status, TodoRequest } from '../../types/types';
+import type { Todo, TodoRequest } from '../../types/types';
 
-import CancelIcon from "../../assets/img/icons/cancel.svg?react";
-import EditIcon from "../../assets/img/icons/note.svg?react";
-import SaveIcon from "../../assets/img/icons/save.svg?react";
-import DeleteIcon from "../../assets/img/icons/trash.svg?react";
+
+
 
 import classes from './TodoItem.module.css';
 
+import { Card, Flex, Checkbox, Button, Input, Form } from 'antd';
+import type { CheckboxProps, FormProps } from 'antd';
+import { StopOutlined, FormOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
 
+type FieldType = {
+    title: string;
+}
 
 const TodoItem: React.FC<{
     todo: Todo;
     refreshData: () => Promise<void>;
-    recordError: (error: Status) => void;
-}> = ({ todo, recordError, refreshData }) => {
+
+}> = ({ todo, refreshData }) => {
 
 
 
@@ -26,10 +29,10 @@ const TodoItem: React.FC<{
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
 
-    async function handleEditStatus(event: React.ChangeEvent<HTMLInputElement>) {
+    const handleEditStatus: CheckboxProps['onChange'] = async (e) => {
         try {
             setIsLoading(true);
-            const newStatus = event.target.checked;
+            const newStatus = e.target.checked;
             const todoRequest: TodoRequest = { isDone: newStatus, title: todo.title };
             await editItem(todo.id, todoRequest);
             await refreshData();
@@ -38,8 +41,7 @@ const TodoItem: React.FC<{
         catch (error) {
             alert(`Не удалось отредаткировать статус задачки ${error}`);
         }
-
-    }
+    };
 
     function handleChangeTitleText(event: React.ChangeEvent<HTMLInputElement>) {
         setEditedTitle(event.target.value);
@@ -50,28 +52,27 @@ const TodoItem: React.FC<{
     }
 
 
+    const onFinish: FormProps<FieldType>['onFinish'] = async () => {
+        await handleSave();
+    };
+
     async function handleSave() {
-        const validationInfo = titleValidation(editedTitle);
-        recordError(validationInfo);
-        if (validationInfo.isValid) {
-            try {
-                setIsLoading(true);
-                const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
-                await editItem(todo.id, todoRequest);
-                await refreshData();
-                setIsLoading(false);
-                setIsEditing(false);
-            }
-            catch (error) {
-                alert(`Не получилось отредактировать данные ${error}`);
-            }
+        try {
+            setIsLoading(true);
+            const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
+            await editItem(todo.id, todoRequest);
+            await refreshData();
+            setIsLoading(false);
+            setIsEditing(false);
+        }
+        catch (error) {
+            alert(`Не получилось отредактировать данные ${error}`);
         }
     }
 
     function handleCancel() {
         setIsEditing(false);
         setEditedTitle(todo.title);
-        recordError({ isValid: true, message: '' })
     }
 
     async function handleDelete() {
@@ -92,19 +93,55 @@ const TodoItem: React.FC<{
         titleElement = <p className={`${classes.itemInputText} ${classes.blue}`}>Загрузочка...</p>
     }
     return (
-        <li className={classes.item}>
-            <input type="checkbox" className={classes.checkbox} checked={todo.isDone} onChange={handleEditStatus} />
+        <li>
+            <Card >
+                <Form
+                    onFinish={onFinish}
+                    initialValues={{
+                        title: editedTitle
+                    }}>
 
-            {isEditing ? <input className={`${classes.itemInputText} ${todo.isDone ? classes.isDone : ''}`} value={editedTitle} onChange={handleChangeTitleText} /> :
-                titleElement}
+                    <Flex align='center' >
 
-            {isEditing ? <button className={classes.saveBtn} onClick={handleSave}><SaveIcon className={classes.itemIcon} /></button> :
-                <button className={classes.editBtn} onClick={handleEditing}><EditIcon className={classes.itemIcon} /></button>}
+                        <Checkbox defaultChecked={todo.isDone} onChange={handleEditStatus} />
 
-            {isEditing ? <button className={classes.cancelButton} onClick={handleCancel}>
-                <CancelIcon className={classes.itemIcon} /></button> :
-                <button className={classes.deleteBtn} onClick={handleDelete}><DeleteIcon className={classes.itemIcon} /></button>}
-        </li>
+
+                        {isEditing ? <Form.Item
+                            style={{ flexGrow: 1 }}
+                            rules={[{ required: true, message: 'Запись не может быть пустой' },
+                            { min: 2, max: 64, message: 'Запись должна содержать от 2 до 64 символов' }]}
+                            name='title'>
+                            {/* Эх, не стал возится. Оставил классы для этого инпута. Надеюсь не критично. */}
+                            <Input
+
+                                variant='borderless'
+                                className={`${todo.isDone ? classes.isDone : ''}`}
+                                onChange={handleChangeTitleText} />
+                        </Form.Item> : titleElement}
+
+                        {isEditing ? <Form.Item>
+                            <Button type='primary' size='large' htmlType='submit'>
+                                <SaveOutlined style={{ fontSize: '24px', color: 'white' }} />
+                            </Button>
+                        </Form.Item> :
+                            <Button type='primary' size='large' onClick={handleEditing}>
+                                <FormOutlined style={{ fontSize: '24px', color: 'white' }} />
+                            </Button>
+
+                        }
+
+
+                        {isEditing ? <Button color='yellow' variant='solid' size='large' onClick={handleCancel}>
+                            <StopOutlined style={{ fontSize: '24px', color: 'white' }} />
+                        </Button> :
+                            <Button color='danger' variant='solid' size='large' onClick={handleDelete}>
+                                <DeleteOutlined style={{ fontSize: '24px', color: 'white' }} />
+                            </Button>}
+
+                    </Flex>
+                </Form>
+            </Card >
+        </li >
     );
 }
 
