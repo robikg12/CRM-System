@@ -3,9 +3,6 @@ import { editItem, deleteItem } from '../../api/https';
 
 import type { Todo, TodoRequest } from '../../types/types';
 
-
-
-
 import classes from './TodoItem.module.css';
 
 import { Card, Flex, Checkbox, Button, Input, Form } from 'antd';
@@ -28,6 +25,7 @@ const TodoItem: React.FC<{
     const [editedTitle, setEditedTitle] = useState<string>(todo.title);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    const [form] = Form.useForm();
 
     const handleEditStatus: CheckboxProps['onChange'] = async (e) => {
         try {
@@ -71,8 +69,10 @@ const TodoItem: React.FC<{
     }
 
     function handleCancel() {
-        setIsEditing(false);
         setEditedTitle(todo.title);
+        form.setFieldValue('title', todo.title); //Пришлось добавить эту строчку, чтобы исправить ошибку.
+        setIsEditing(false);
+
     }
 
     async function handleDelete() {
@@ -96,10 +96,9 @@ const TodoItem: React.FC<{
         <li>
             <Card >
                 <Form
-                    onFinish={onFinish}
-                    initialValues={{
-                        title: editedTitle
-                    }}>
+                    form={form}
+                    initialValues={{ title: editedTitle }}
+                    onFinish={onFinish}>
 
                     <Flex align='center' >
 
@@ -115,7 +114,8 @@ const TodoItem: React.FC<{
                             <Input
                                 variant='borderless'
                                 className={`${todo.isDone ? classes.isDone : ''}`}
-                                onChange={handleChangeTitleText} />
+                                onChange={handleChangeTitleText}
+                            />
 
                         </Form.Item> : titleElement}
 
@@ -127,7 +127,6 @@ const TodoItem: React.FC<{
                             <Button type='primary' size='large' onClick={handleEditing}>
                                 <FormOutlined style={{ fontSize: '24px', color: 'white' }} />
                             </Button>
-
                         }
 
 
