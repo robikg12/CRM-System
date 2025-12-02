@@ -4,7 +4,7 @@ import TodosList from '../components/TodosList/TodosList'
 
 import type { Todo, TodoInfo, MetaResponse, Category } from '../types/types';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { fetchTodosData } from "../api/https";
 
 const TodoListPage: React.FC = () => {
@@ -24,12 +24,12 @@ const TodoListPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
 
-    async function handleSelectCategory(category: Category) {
+    const handleSelectCategory = useCallback((category: Category) => {
         setCurrentCategory(category);
-    }
+    }, [])
 
 
-    async function refreshData() {
+    const refreshData = useCallback(async () => {
         try {
             const responseData = await fetchTodosData(currentCategory);
             setTodosData(responseData);
@@ -37,12 +37,17 @@ const TodoListPage: React.FC = () => {
         catch (error) {
             alert(`Не удалось получить записи${error}`);
         }
-    }
+    }, [todosData, currentCategory]);
 
     useEffect(() => {
         (async function () {
             await refreshData();
-            setIsLoading(false);
+            if (isLoading) {
+                setIsLoading(false); //Думал как сделать useCallback/memo для стейта isLoading, а потом подумал
+                //  просто оставить, не делать, так как он менятся только один раз при начальном useEffect.
+                // Правда, на случай, если isLoading был false и когда я пишу setIsLoading(false) это считается за
+                // изменение стейта (не знаю), то на всякий случай добавил if
+            }
         })();
 
         const intervalId = setInterval(refreshData, 5000);

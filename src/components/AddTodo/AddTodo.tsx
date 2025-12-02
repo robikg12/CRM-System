@@ -1,6 +1,8 @@
 import { createNewItem } from '../../api/https'
 import type { TodoRequest } from '../../types/types';
 
+import React from 'react';
+
 import { Button, Form, Input, Flex } from 'antd';
 
 import type { FormProps } from 'antd';
@@ -32,7 +34,7 @@ const AddTodo: React.FC<{
         <Form form={form} onFinish={onFinish} >
             <Flex gap="middle" align='center'>
                 <Form.Item name="title" rules={[{ required: true, message: 'Введите задачу' }, { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}>
-                    <Input placeholder='Нужно сделать...' size='large' style={{width: '415px'}}/>
+                    <Input placeholder='Нужно сделать...' size='large' style={{ width: '415px' }} />
                 </Form.Item>
                 <Form.Item >
                     <Button type="primary" htmlType="submit">Add</Button>
@@ -42,4 +44,4 @@ const AddTodo: React.FC<{
     );
 }
 
-export default AddTodo;
+export default React.memo(AddTodo);

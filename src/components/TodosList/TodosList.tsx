@@ -1,5 +1,7 @@
 import TodoItem from '../TodoItem/TodoItem';
 
+import React from 'react';
+
 import classes from './TodosList.module.css';
 
 import type { Todo, TodoInfo, MetaResponse } from '../../types/types';
@@ -30,4 +32,4 @@ const TodosList: React.FC<{
 
 }
 
-export default TodosList
+export default React.memo(TodosList);

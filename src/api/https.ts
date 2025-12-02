@@ -2,13 +2,15 @@ import type { MetaResponse, Todo, Category, TodoInfo, TodoRequest } from '../typ
 
 import axios from 'axios';
 
-axios.defaults.baseURL = 'https://easydev.club/api/v1'
-
+//Точно не знаю как правильно инстансы называть =(
+const todosApi = axios.create({
+    baseURL: 'https://easydev.club/api/v1'
+});
 
 export async function fetchTodosData(category: Category): Promise<MetaResponse<Todo, TodoInfo>> {
 
     try {
-        const response = await axios.get('/todos', {
+        const response = await todosApi.get('/todos', {
             params: {
                 filter: category
             }
@@ -25,7 +27,7 @@ export async function fetchTodosData(category: Category): Promise<MetaResponse<T
 export async function createNewItem(todoRequest: TodoRequest): Promise<Todo> {
 
     try {
-        const response = await axios.post('/todos', todoRequest);
+        const response = await todosApi.post('/todos', todoRequest);
         return response.data;
     }
     catch (error) {
@@ -37,7 +39,8 @@ export async function createNewItem(todoRequest: TodoRequest): Promise<Todo> {
 export async function editItem(id: number, todoRequest: TodoRequest): Promise<Todo> {
 
     try {
-        const response = await axios.put(`/todos/${id}`, todoRequest);
+        // По идее это не квери параметр, так что оставил url в строке
+        const response = await todosApi.put(`/todos/${id}`, todoRequest);
         return response.data;
     }
     catch (error) {
@@ -49,7 +52,8 @@ export async function editItem(id: number, todoRequest: TodoRequest): Promise<To
 export async function deleteItem(id: number): Promise<Response> {
 
     try {
-        const response = await axios.delete(`/todos/${id}`);
+        // По идее это не квери параметр, так что оставил url в строке
+        const response = await todosApi.delete(`/todos/${id}`);
         return response.data;
     }
     catch (error) {

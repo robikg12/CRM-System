@@ -1,5 +1,7 @@
 import type { TodoInfo, Category } from '../../types/types';
 
+import React from 'react';
+
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 
@@ -7,7 +9,7 @@ import type { TabsProps } from 'antd';
 const TodoFilter: React.FC<{
     currentCategory: Category;
     counts: TodoInfo;
-    handleSelectCategory: (category: Category) => Promise<void>
+    handleSelectCategory: (category: Category) => void
 }> = ({ counts, handleSelectCategory }) => {
 
     const onChange = (key: string) => {
@@ -31,10 +33,8 @@ const TodoFilter: React.FC<{
     ];
 
     return (
-
         <Tabs defaultActiveKey="all" items={items} onChange={onChange} />
-        
     );
 }
 
-export default TodoFilter
+export default React.memo(TodoFilter);
