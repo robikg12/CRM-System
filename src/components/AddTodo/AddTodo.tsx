@@ -33,7 +33,7 @@ const AddTodo: React.FC<{
     return (
         <Form form={form} onFinish={onFinish} >
             <Flex gap="middle" align='center'>
-                <Form.Item name="title" rules={[{ required: true, message: 'Введите задачу' }, { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}>
+                <Form.Item name="title" rules={[{ required: true, message: 'Введите задачу' }, { whitespace: true, message: "Задача не может быть пустой" }, { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}>
                     <Input placeholder='Нужно сделать...' size='large' style={{ width: '415px' }} />
                 </Form.Item>
                 <Form.Item >

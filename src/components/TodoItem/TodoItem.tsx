@@ -107,9 +107,9 @@ const TodoItem: React.FC<{
 
                         {isEditing ? <Form.Item
                             style={{ flexGrow: 1, marginTop: "20px" }} //как я понял обёртки Form.item сбивают flex align center для этих элементов, самый простой способ который придумал - добавить margin
-                            rules={[{ required: true, message: 'Запись не может быть пустой' },
-                            { min: 2, max: 64, message: 'Запись должна содержать от 2 до 64 символов' }]}
-                            name='title'>
+                            rules={[{ required: true, message: 'Введите задачу' }, { whitespace: true, message: "Задача не может быть пустой" }, { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}
+                            name='title'
+                        >
                             {/* Эх, не стал возится. Оставил классы для этого инпута. Надеюсь не критично. */}
                             <Input
                                 variant='borderless'
