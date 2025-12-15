@@ -2,15 +2,15 @@ import type { MetaResponse, Todo, Category, TodoInfo, TodoRequest } from '../typ
 
 import axios from 'axios';
 
-//Точно не знаю как правильно инстансы называть =(
-const todosApi = axios.create({
+
+const apiClient = axios.create({
     baseURL: 'https://easydev.club/api/v1'
 });
 
 export async function fetchTodosData(category: Category): Promise<MetaResponse<Todo, TodoInfo>> {
 
     try {
-        const response = await todosApi.get('/todos', {
+        const response = await apiClient.get('/todos', {
             params: {
                 filter: category
             }
@@ -18,7 +18,7 @@ export async function fetchTodosData(category: Category): Promise<MetaResponse<T
         return response.data;
     }
     catch (error) {
-        throw new Error(`Не удалось получить записи списка задач по категории  / ${error}`);
+        throw new Error(`Не удалось получить записи списка задач по категории`);
     }
 }
 
@@ -27,11 +27,11 @@ export async function fetchTodosData(category: Category): Promise<MetaResponse<T
 export async function createNewItem(todoRequest: TodoRequest): Promise<Todo> {
 
     try {
-        const response = await todosApi.post('/todos', todoRequest);
+        const response = await apiClient.post('/todos', todoRequest);
         return response.data;
     }
     catch (error) {
-        throw new Error(`Не удалось создать новую задачу / ${error}`);
+        throw new Error(`Не удалось создать новую задачу `);
     }
 }
 
@@ -40,24 +40,24 @@ export async function editItem(id: number, todoRequest: TodoRequest): Promise<To
 
     try {
         // По идее это не квери параметр, так что оставил url в строке
-        const response = await todosApi.put(`/todos/${id}`, todoRequest);
+        const response = await apiClient.put(`/todos/${id}`, todoRequest);
         return response.data;
     }
     catch (error) {
-        throw new Error(`Не удалось отредактировать запись / ${error}`);
+        throw new Error(`Не удалось отредактировать запись `);
     }
 }
 
 
-export async function deleteItem(id: number): Promise<Response> {
+export async function deleteItem(id: number): Promise<void> {
 
     try {
         // По идее это не квери параметр, так что оставил url в строке
-        const response = await todosApi.delete(`/todos/${id}`);
-        return response.data;
+        await apiClient.delete(`/todos/${id}`);
+
     }
     catch (error) {
-        throw new Error(`Не удалось удалить запись / ${error}`);
+        throw new Error(`Не удалось удалить запись `);
     }
 }
 

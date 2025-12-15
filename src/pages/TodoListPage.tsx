@@ -2,10 +2,12 @@ import AddTodo from '../components/AddTodo/AddTodo';
 import TodoFilter from '../components/TodoFilter/TodoFilter';
 import TodosList from '../components/TodosList/TodosList'
 
-import type { Todo, TodoInfo, MetaResponse, Category } from '../types/types';
+import type { Todo, TodoInfo, MetaResponse, Category, ErrorInfo } from '../types/types';
 
 import { useState, useEffect, useCallback } from "react";
 import { fetchTodosData } from "../api/https";
+
+import { Alert } from 'antd';
 
 const TodoListPage: React.FC = () => {
 
@@ -22,11 +24,22 @@ const TodoListPage: React.FC = () => {
     });
     const [currentCategory, setCurrentCategory] = useState<Category>('all');
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
+    const [errorInfo, setErrorInfo] = useState<ErrorInfo>({ isActiveError: false, message: '' });
 
     const handleSelectCategory = useCallback((category: Category) => {
         setCurrentCategory(category);
+    }, []);
+
+    const handleSetErrorInfo = useCallback((error: ErrorInfo) => {
+        setErrorInfo(error);
     }, [])
+
+    const onClose: React.MouseEventHandler<HTMLButtonElement> = () => {
+        handleSetErrorInfo({
+            isActiveError: false,
+            message: ''
+        })
+    };
 
 
     const refreshData = useCallback(async () => {
@@ -35,34 +48,42 @@ const TodoListPage: React.FC = () => {
             setTodosData(responseData);
         }
         catch (error) {
-            alert(`Не удалось получить записи${error}`);
+            if (error instanceof Error) { // К такому вот подходу дошёл не сам, а загуглил.
+                handleSetErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
         }
-    }, [todosData, currentCategory]);
+    }, [currentCategory]);
 
     useEffect(() => {
         (async function () {
             await refreshData();
-            if (isLoading) {
-                setIsLoading(false); //Думал как сделать useCallback/memo для стейта isLoading, а потом подумал
-                //  просто оставить, не делать, так как он менятся только один раз при начальном useEffect.
-                // Правда, на случай, если isLoading был false и когда я пишу setIsLoading(false) это считается за
-                // изменение стейта (не знаю), то на всякий случай добавил if
-            }
         })();
+
+        setIsLoading(false);
 
         const intervalId = setInterval(refreshData, 5000);
         return () => clearInterval(intervalId); //Про вот эту вот штуку - загуглил.
     }, [currentCategory]);
 
 
-
     return (
         <div className="wrapper">
-            <AddTodo refreshData={refreshData} />
+            {errorInfo.isActiveError &&
+                <Alert
+                    title={errorInfo.message}
+                    type="error"
+                    closable={{ closeIcon: true, onClose, 'aria-label': 'close' }} />}
+
+            <AddTodo
+                refreshData={refreshData}
+                setErrorInfo={handleSetErrorInfo} />
+
             <div className="wrapperOfAllList">
 
                 {todosData.info && <TodoFilter
-                    currentCategory={currentCategory}
                     counts={todosData.info}
                     handleSelectCategory={handleSelectCategory}
                 />
@@ -72,6 +93,7 @@ const TodoListPage: React.FC = () => {
                         todosData={todosData}
                         refreshData={refreshData}
                         isLoading={isLoading}
+                        setErrorInfo={handleSetErrorInfo}
                     />
                 }
             </div>

@@ -7,14 +7,17 @@ import type { TabsProps } from 'antd';
 
 
 const TodoFilter: React.FC<{
-    currentCategory: Category;
+
     counts: TodoInfo;
     handleSelectCategory: (category: Category) => void
 }> = ({ counts, handleSelectCategory }) => {
 
-    const onChange = (key: string) => {
-        if (key === 'all' || key === 'inWork' || key === 'completed')
-            handleSelectCategory(key);
+    function onChange(key: Category): void;
+    function onChange(key: string): void;
+    function onChange(key: string): void {
+        // Раньше у меня вместо того, что выше был такой type guard, да и считаю вполне правильный. В ревью засчиталось как ошибка.
+        // if (key === 'all' || key === 'inWork' || key === 'completed') 
+        handleSelectCategory(key as Category);
     };
 
     const items: TabsProps['items'] = [
@@ -33,8 +36,8 @@ const TodoFilter: React.FC<{
     ];
 
     return (
-        <Tabs defaultActiveKey="all" items={items} onChange={onChange} />
+        <Tabs items={items} onChange={onChange} />
     );
 }
 
-export default React.memo(TodoFilter);
+export default TodoFilter;

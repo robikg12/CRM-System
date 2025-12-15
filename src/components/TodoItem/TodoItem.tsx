@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { editItem, deleteItem } from '../../api/https';
 
-import type { Todo, TodoRequest } from '../../types/types';
+import type { Todo, TodoRequest, ErrorInfo } from '../../types/types';
 
 import classes from './TodoItem.module.css';
 
@@ -16,8 +16,9 @@ type FieldType = {
 const TodoItem: React.FC<{
     todo: Todo;
     refreshData: () => Promise<void>;
+    setErrorInfo: (error: ErrorInfo) => void;
 
-}> = ({ todo, refreshData }) => {
+}> = ({ todo, refreshData, setErrorInfo }) => {
 
 
 
@@ -37,7 +38,12 @@ const TodoItem: React.FC<{
             setIsLoading(false);
         }
         catch (error) {
-            alert(`Не удалось отредаткировать статус задачки ${error}`);
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
         }
     };
 
@@ -50,11 +56,7 @@ const TodoItem: React.FC<{
     }
 
 
-    const onFinish: FormProps<FieldType>['onFinish'] = async () => {
-        await handleSave();
-    };
-
-    async function handleSave() {
+    const handleSaveTodo: FormProps<FieldType>['onFinish'] = async () => {
         try {
             setIsLoading(true);
             const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
@@ -64,11 +66,16 @@ const TodoItem: React.FC<{
             setIsEditing(false);
         }
         catch (error) {
-            alert(`Не получилось отредактировать данные ${error}`);
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
         }
-    }
+    };
 
-    function handleCancel() {
+    function handleCancelEditing() {
         setEditedTitle(todo.title);
         form.setFieldValue('title', todo.title); //Пришлось добавить эту строчку, чтобы исправить ошибку.
         setIsEditing(false);
@@ -84,7 +91,12 @@ const TodoItem: React.FC<{
             setIsLoading(false);
         }
         catch (error) {
-            alert(`Ошибка при удалении записи ${error}`);
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
         }
     }
 
@@ -93,55 +105,52 @@ const TodoItem: React.FC<{
         titleElement = <p className={`${classes.itemInputText} ${classes.blue}`}>Загрузочка...</p>
     }
     return (
-        <li>
-            <Card >
-                <Form
-                    form={form}
-                    initialValues={{ title: editedTitle }}
-                    onFinish={onFinish}>
+        <Card style={{ width: '100%' }}>
+            <Form
+                form={form}
+                initialValues={{ title: editedTitle }}
+                onFinish={handleSaveTodo}>
 
-                    <Flex align='center' >
+                <Flex align='center' >
 
-                        <Checkbox defaultChecked={todo.isDone} onChange={handleEditStatus} />
+                    <Checkbox defaultChecked={todo.isDone} onChange={handleEditStatus} />
 
 
-                        {isEditing ? <Form.Item
+                    {isEditing ? <>
+                        <Form.Item
                             style={{ flexGrow: 1, marginTop: "20px" }} //как я понял обёртки Form.item сбивают flex align center для этих элементов, самый простой способ который придумал - добавить margin
-                            rules={[{ required: true, message: 'Введите задачу' }, { whitespace: true, message: "Задача не может быть пустой" }, { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}
-                            name='title'
-                        >
-                            {/* Эх, не стал возится. Оставил классы для этого инпута. Надеюсь не критично. */}
+                            rules={[{ required: true, message: 'Введите задачу' },
+                            { whitespace: true, message: "Задача не может быть пустой" },
+                            { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}
+                            name='title'>
+
                             <Input
                                 variant='borderless'
                                 className={`${todo.isDone ? classes.isDone : ''}`}
-                                onChange={handleChangeTitleText}
-                            />
-
-                        </Form.Item> : titleElement}
-
-                        {isEditing ? <Form.Item >
+                                onChange={handleChangeTitleText} />
+                        </Form.Item>
+                        <Form.Item >
                             <Button type='primary' size='large' htmlType='submit' style={{ marginTop: "22px" }}>
                                 <SaveOutlined style={{ fontSize: '24px', color: 'white' }} />
                             </Button>
-                        </Form.Item> :
-                            <Button type='primary' size='large' onClick={handleEditing}>
-                                <FormOutlined style={{ fontSize: '24px', color: 'white' }} />
-                            </Button>
-                        }
-
-
-                        {isEditing ? <Button color='yellow' variant='solid' size='large' onClick={handleCancel}>
+                        </Form.Item>
+                        <Button color='yellow' variant='solid' size='large' onClick={handleCancelEditing}>
                             <StopOutlined style={{ fontSize: '24px', color: 'white' }} />
-                        </Button> :
-                            <Button color='danger' variant='solid' size='large' onClick={handleDelete}>
-                                <DeleteOutlined style={{ fontSize: '24px', color: 'white' }} />
-                            </Button>}
+                        </Button>
+                    </> : <>
+                        {titleElement}
+                        <Button type='primary' size='large' onClick={handleEditing}>
+                            <FormOutlined style={{ fontSize: '24px', color: 'white' }} />
+                        </Button>
+                        <Button color='danger' variant='solid' size='large' onClick={handleDelete}>
+                            <DeleteOutlined style={{ fontSize: '24px', color: 'white' }} />
+                        </Button>
+                    </>}
 
-                    </Flex>
-                </Form>
-            </Card >
-        </li >
+                </Flex>
+            </Form>
+        </Card >
     );
 }
 
-export default React.memo(TodoItem);
+export default TodoItem;

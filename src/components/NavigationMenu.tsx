@@ -27,7 +27,7 @@ const NavigationMenu: React.FC = () => {
     };
 
     return <>
-        <Menu onClick={onClick} defaultSelectedKeys={[currentPath]} mode="vertical" items={items} />
+        <Menu onClick={onClick} selectedKeys={[currentPath]} mode="vertical" items={items} />
     </>
 }
 

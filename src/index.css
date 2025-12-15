@@ -22,12 +22,11 @@ body {
 }
 
 .wrapper {
-  justify-self: center;
-  width: 31.25rem;
+  width: 525px;
   min-width: 390px;
   height: auto;
   min-height: 500px;
-  margin-top: 70px;
+  margin: 70px 0px 0px 600px;
   padding: 15px;
 }
 
