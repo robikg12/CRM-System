@@ -15,9 +15,7 @@ const TodosList: React.FC<{
     setErrorInfo: (error: ErrorInfo) => void;
 
 }> = ({ todosData, refreshData, isLoading, setErrorInfo }) => {
-
-    console.log('TodosList.tsx');
-
+    
     return (
         <>
             {isLoading && <p className={classes.loadingText}>Загрузочка...</p>}
