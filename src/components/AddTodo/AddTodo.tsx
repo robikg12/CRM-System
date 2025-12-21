@@ -42,8 +42,6 @@ const AddTodo: React.FC<{
         }
     }
 
-    console.log('adddd');
-
     return (
         <Form
             form={form}
