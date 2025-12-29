@@ -1,25 +1,14 @@
-
-
-
-export type Status = {
-    isValid: boolean;
-    message: string;
-}
-
-export type Category = 'all' | 'completed' | 'inWork';
-
-
+export type Category = 'all' | 'inWork' | 'completed';
 
 export interface TodoRequest {
-    title?: string;
-    isDone?: boolean;  
+    title: string;
+    isDone: boolean;
 }
-
 
 export interface Todo {
     id: number;
     title: string;
-    created: string; 
+    created: string;
     isDone: boolean;
 }
 
@@ -29,13 +18,17 @@ export interface TodoInfo {
     inWork: number
 }
 
-
 export interface MetaResponse<T, N> {
     data: T[]
     info?: N
     meta: {
         totalAmount: number
     }
+}
+
+export interface ErrorInfo {
+    isActiveError: boolean;
+    message: string;
 }
 
 

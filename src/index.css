@@ -22,13 +22,11 @@ body {
 }
 
 .wrapper {
-  justify-self: center;
-  width: 31.25rem;
+  width: 525px;
   min-width: 390px;
   height: auto;
   min-height: 500px;
-  margin-top: 70px;
-  background-color: #ffffff;
+  margin: 70px 0px 0px 600px;
   padding: 15px;
 }
 
@@ -47,8 +45,8 @@ body {
 .wrapperOfAllList {
   flex: 0 0 100%;
   margin-top: 20px;
-  padding: 10px;
+
+  padding: 15px 15px 15px 15px;
   flex-direction: column;
-  height: auto;
   background-color: #ffffff;
 }
