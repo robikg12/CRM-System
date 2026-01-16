@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 import { editItem, deleteItem } from '../../api/https';
-import { titleValidation } from '../../validation';
 
-import type { Todo, Status, TodoRequest } from '../../types/types';
-
-import CancelIcon from "../../assets/img/icons/cancel.svg?react";
-import EditIcon from "../../assets/img/icons/note.svg?react";
-import SaveIcon from "../../assets/img/icons/save.svg?react";
-import DeleteIcon from "../../assets/img/icons/trash.svg?react";
+import type { Todo, TodoRequest, ErrorInfo } from '../../types/types';
 
 import classes from './TodoItem.module.css';
 
+import { Card, Flex, Checkbox, Button, Input, Form } from 'antd';
+import type { CheckboxProps, FormProps } from 'antd';
+import { StopOutlined, FormOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
 
+type FieldType = {
+    title: string;
+}
 
 const TodoItem: React.FC<{
     todo: Todo;
     refreshData: () => Promise<void>;
-    recordError: (error: Status) => void;
-}> = ({ todo, recordError, refreshData }) => {
+    setErrorInfo: (error: ErrorInfo) => void;
+
+}> = ({ todo, refreshData, setErrorInfo }) => {
 
 
 
@@ -25,21 +26,26 @@ const TodoItem: React.FC<{
     const [editedTitle, setEditedTitle] = useState<string>(todo.title);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    const [form] = Form.useForm();
 
-    async function handleEditStatus(event: React.ChangeEvent<HTMLInputElement>) {
+    const handleEditStatus: CheckboxProps['onChange'] = async (e) => {
         try {
             setIsLoading(true);
-            const newStatus = event.target.checked;
+            const newStatus = e.target.checked;
             const todoRequest: TodoRequest = { isDone: newStatus, title: todo.title };
             await editItem(todo.id, todoRequest);
             await refreshData();
             setIsLoading(false);
         }
         catch (error) {
-            alert(`Не удалось отредаткировать статус задачки ${error}`);
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
         }
-
-    }
+    };
 
     function handleChangeTitleText(event: React.ChangeEvent<HTMLInputElement>) {
         setEditedTitle(event.target.value);
@@ -50,28 +56,30 @@ const TodoItem: React.FC<{
     }
 
 
-    async function handleSave() {
-        const validationInfo = titleValidation(editedTitle);
-        recordError(validationInfo);
-        if (validationInfo.isValid) {
-            try {
-                setIsLoading(true);
-                const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
-                await editItem(todo.id, todoRequest);
-                await refreshData();
-                setIsLoading(false);
-                setIsEditing(false);
-            }
-            catch (error) {
-                alert(`Не получилось отредактировать данные ${error}`);
+    const handleSaveTodo: FormProps<FieldType>['onFinish'] = async () => {
+        try {
+            setIsLoading(true);
+            const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
+            await editItem(todo.id, todoRequest);
+            await refreshData();
+            setIsLoading(false);
+            setIsEditing(false);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
             }
         }
-    }
+    };
 
-    function handleCancel() {
-        setIsEditing(false);
+    function handleCancelEditing() {
         setEditedTitle(todo.title);
-        recordError({ isValid: true, message: '' })
+        form.setFieldValue('title', todo.title); //Пришлось добавить эту строчку, чтобы исправить ошибку.
+        setIsEditing(false);
+
     }
 
     async function handleDelete() {
@@ -83,7 +91,12 @@ const TodoItem: React.FC<{
             setIsLoading(false);
         }
         catch (error) {
-            alert(`Ошибка при удалении записи ${error}`);
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
         }
     }
 
@@ -92,20 +105,52 @@ const TodoItem: React.FC<{
         titleElement = <p className={`${classes.itemInputText} ${classes.blue}`}>Загрузочка...</p>
     }
     return (
-        <li className={classes.item}>
-            <input type="checkbox" className={classes.checkbox} checked={todo.isDone} onChange={handleEditStatus} />
+        <Card style={{ width: '100%' }}>
+            <Form
+                form={form}
+                initialValues={{ title: editedTitle }}
+                onFinish={handleSaveTodo}>
 
-            {isEditing ? <input className={`${classes.itemInputText} ${todo.isDone ? classes.isDone : ''}`} value={editedTitle} onChange={handleChangeTitleText} /> :
-                titleElement}
+                <Flex align='center' >
 
-            {isEditing ? <button className={classes.saveBtn} onClick={handleSave}><SaveIcon className={classes.itemIcon} /></button> :
-                <button className={classes.editBtn} onClick={handleEditing}><EditIcon className={classes.itemIcon} /></button>}
+                    <Checkbox defaultChecked={todo.isDone} onChange={handleEditStatus} />
 
-            {isEditing ? <button className={classes.cancelButton} onClick={handleCancel}>
-                <CancelIcon className={classes.itemIcon} /></button> :
-                <button className={classes.deleteBtn} onClick={handleDelete}><DeleteIcon className={classes.itemIcon} /></button>}
-        </li>
+
+                    {isEditing ? <>
+                        <Form.Item
+                            style={{ flexGrow: 1, marginTop: "20px" }} //как я понял обёртки Form.item сбивают flex align center для этих элементов, самый простой способ который придумал - добавить margin
+                            rules={[{ required: true, message: 'Введите задачу' },
+                            { whitespace: true, message: "Задача не может быть пустой" },
+                            { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}
+                            name='title'>
+
+                            <Input
+                                variant='borderless'
+                                className={`${todo.isDone ? classes.isDone : ''}`}
+                                onChange={handleChangeTitleText} />
+                        </Form.Item>
+                        <Form.Item >
+                            <Button type='primary' size='large' htmlType='submit' style={{ marginTop: "22px" }}>
+                                <SaveOutlined style={{ fontSize: '24px', color: 'white' }} />
+                            </Button>
+                        </Form.Item>
+                        <Button color='yellow' variant='solid' size='large' onClick={handleCancelEditing}>
+                            <StopOutlined style={{ fontSize: '24px', color: 'white' }} />
+                        </Button>
+                    </> : <>
+                        {titleElement}
+                        <Button type='primary' size='large' onClick={handleEditing}>
+                            <FormOutlined style={{ fontSize: '24px', color: 'white' }} />
+                        </Button>
+                        <Button color='danger' variant='solid' size='large' onClick={handleDelete}>
+                            <DeleteOutlined style={{ fontSize: '24px', color: 'white' }} />
+                        </Button>
+                    </>}
+
+                </Flex>
+            </Form>
+        </Card >
     );
 }
 
-export default TodoItem
+export default TodoItem;

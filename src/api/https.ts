@@ -1,74 +1,63 @@
 import type { MetaResponse, Todo, Category, TodoInfo, TodoRequest } from '../types/types';
 
+import axios from 'axios';
 
 
-const baseUrl: string = 'https://easydev.club/api/v1/todos';
-
+const apiClient = axios.create({
+    baseURL: 'https://easydev.club/api/v1'
+});
 
 export async function fetchTodosData(category: Category): Promise<MetaResponse<Todo, TodoInfo>> {
 
-    const params = {
-        filter: category
-    };
-    const queryParams = new URLSearchParams(params);
-
-    const response = await fetch(`${baseUrl}?${queryParams}`);
-    const resData = await response.json();
-    if (!response.ok) {
-        throw new Error('Не удалось получить записи списка задач по категории');
+    try {
+        const response = await apiClient.get('/todos', {
+            params: {
+                filter: category
+            }
+        });
+        return response.data;
     }
-
-    return resData;
+    catch (error) {
+        throw new Error(`Не удалось получить записи списка задач по категории`);
+    }
 }
 
 
 // TODO изучить что такое .then
 export async function createNewItem(todoRequest: TodoRequest): Promise<Todo> {
 
-    const response = await fetch(baseUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(todoRequest)
-    });
-    const resData = await response.json();
-    if (!response.ok) {
-        throw new Error('Не удалось создать новую задачу');
+    try {
+        const response = await apiClient.post('/todos', todoRequest);
+        return response.data;
     }
-    return resData;
+    catch (error) {
+        throw new Error(`Не удалось создать новую задачу `);
+    }
 }
+
 
 export async function editItem(id: number, todoRequest: TodoRequest): Promise<Todo> {
 
-    const response = await fetch(`${baseUrl}/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(todoRequest)
-    });
-    const resData = await response.json();
-    if (!response.ok) {
-        throw new Error('Не удалось отредактировать запись');
+    try {
+        // По идее это не квери параметр, так что оставил url в строке
+        const response = await apiClient.put(`/todos/${id}`, todoRequest);
+        return response.data;
     }
-    return resData;
+    catch (error) {
+        throw new Error(`Не удалось отредактировать запись `);
+    }
 }
 
 
-export async function deleteItem(id: number): Promise<Response> {
-    const response = await fetch(`${baseUrl}/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    });
+export async function deleteItem(id: number): Promise<void> {
 
+    try {
+        // По идее это не квери параметр, так что оставил url в строке
+        await apiClient.delete(`/todos/${id}`);
 
-    if (!response.ok) {
-        throw new Error('Не удалось удалить запись');
     }
-
-    return response;
+    catch (error) {
+        throw new Error(`Не удалось удалить запись `);
+    }
 }
 

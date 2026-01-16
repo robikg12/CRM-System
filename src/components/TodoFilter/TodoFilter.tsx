@@ -1,32 +1,43 @@
-import classes from './TodoFilter.module.css';
-
 import type { TodoInfo, Category } from '../../types/types';
 
-const TodoFilter: React.FC<{
-    currentCategory: Category;
-    counts: TodoInfo;
-    handleSelectCategory: (category: Category) => Promise<void>
-}> = ({ currentCategory, counts, handleSelectCategory }) => {
+import React from 'react';
 
-    
+import { Tabs } from 'antd';
+import type { TabsProps } from 'antd';
+
+
+const TodoFilter: React.FC<{
+
+    counts: TodoInfo;
+    handleSelectCategory: (category: Category) => void
+}> = ({ counts, handleSelectCategory }) => {
+
+    function onChange(key: Category): void;
+    function onChange(key: string): void;
+    function onChange(key: string): void {
+        // Раньше у меня вместо того, что выше был такой type guard, да и считаю вполне правильный. В ревью засчиталось как ошибка.
+        // if (key === 'all' || key === 'inWork' || key === 'completed') 
+        handleSelectCategory(key as Category);
+    };
+
+    const items: TabsProps['items'] = [
+        {
+            key: 'all',
+            label: `Все (${counts.all})`,
+        },
+        {
+            key: 'inWork',
+            label: `В работе ${counts.inWork}`,
+        },
+        {
+            key: 'completed',
+            label: `сделано ${counts.completed}`,
+        },
+    ];
+
     return (
-        <nav>
-            <ul className={classes.menu}>
-                <li className={`${classes.menuItem} ${currentCategory === 'all' ? classes.selected : ''}`}
-                    onClick={() => handleSelectCategory('all')}>
-                    Все {`(${counts.all})`}
-                </li>
-                <li className={`${classes.menuItem} ${currentCategory === 'inWork' ? classes.selected : ''}`}
-                    onClick={() => handleSelectCategory('inWork')}>
-                    в работе {`(${counts.inWork})`}
-                </li>
-                <li className={`${classes.menuItem} ${currentCategory === 'completed' ? classes.selected : ''}`}
-                    onClick={() => handleSelectCategory('completed')}>
-                    сделано {`(${counts.completed})`}
-                </li>
-            </ul >
-        </nav>
+        <Tabs items={items} onChange={onChange} />
     );
 }
 
-export default TodoFilter
+export default TodoFilter;

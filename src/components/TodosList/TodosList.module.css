@@ -1,7 +1,9 @@
-.lodaingText {
+.loadingText {
     font-size: 22px;
     color: #909090;
 }
-.list{
+
+.list {
     padding: 0px;
+    list-style-type: none;
 }

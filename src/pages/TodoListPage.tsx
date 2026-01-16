@@ -2,12 +2,12 @@ import AddTodo from '../components/AddTodo/AddTodo';
 import TodoFilter from '../components/TodoFilter/TodoFilter';
 import TodosList from '../components/TodosList/TodosList'
 
-import type { Todo, TodoInfo, MetaResponse, Status, Category } from '../types/types';
+import type { Todo, TodoInfo, MetaResponse, Category, ErrorInfo } from '../types/types';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { fetchTodosData } from "../api/https";
 
-
+import { Alert } from 'antd';
 
 const TodoListPage: React.FC = () => {
 
@@ -24,50 +24,66 @@ const TodoListPage: React.FC = () => {
     });
     const [currentCategory, setCurrentCategory] = useState<Category>('all');
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<Status>({ isValid: true, message: '' });
+    const [errorInfo, setErrorInfo] = useState<ErrorInfo>({ isActiveError: false, message: '' });
 
-
-    async function handleSelectCategory(category: Category) {
+    const handleSelectCategory = useCallback((category: Category) => {
         setCurrentCategory(category);
-    }
+    }, []);
+
+    const handleSetErrorInfo = useCallback((error: ErrorInfo) => {
+        setErrorInfo(error);
+    }, [])
+
+    const onClose: React.MouseEventHandler<HTMLButtonElement> = () => {
+        handleSetErrorInfo({
+            isActiveError: false,
+            message: ''
+        })
+    };
 
 
-
-    async function refreshData() {
+    const refreshData = useCallback(async () => {
         try {
             const responseData = await fetchTodosData(currentCategory);
             setTodosData(responseData);
-
-
         }
         catch (error) {
-            alert(`Не удалось получить записи${error}`);
+            if (error instanceof Error) { // К такому вот подходу дошёл не сам, а загуглил.
+                handleSetErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
         }
-    }
-
-
-    function recordError(error: Status) {
-        setError(error);
-    }
-
-
+    }, [currentCategory]);
 
     useEffect(() => {
         (async function () {
             await refreshData();
-            setIsLoading(false);
         })();
 
+        setIsLoading(false);
+
+        const intervalId = setInterval(refreshData, 5000);
+        return () => clearInterval(intervalId); //Про вот эту вот штуку - загуглил.
     }, [currentCategory]);
+
 
     return (
         <div className="wrapper">
-            <AddTodo refreshData={refreshData} recordError={recordError} />
-            {!error.isValid && <div className="errorBlock">{error.message}</div>}
+            {errorInfo.isActiveError &&
+                <Alert
+                    title={errorInfo.message}
+                    type="error"
+                    closable={{ closeIcon: true, onClose, 'aria-label': 'close' }} />}
+
+            <AddTodo
+                refreshData={refreshData}
+                setErrorInfo={handleSetErrorInfo} />
+
             <div className="wrapperOfAllList">
 
                 {todosData.info && <TodoFilter
-                    currentCategory={currentCategory}
                     counts={todosData.info}
                     handleSelectCategory={handleSelectCategory}
                 />
@@ -77,7 +93,8 @@ const TodoListPage: React.FC = () => {
                         todosData={todosData}
                         refreshData={refreshData}
                         isLoading={isLoading}
-                        recordError={recordError} />
+                        setErrorInfo={handleSetErrorInfo}
+                    />
                 }
             </div>
         </div>
