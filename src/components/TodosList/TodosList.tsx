@@ -4,18 +4,15 @@ import TodoItem from '../TodoItem/TodoItem';
 
 import classes from './TodosList.module.css';
 
-import type { Todo, TodoInfo, MetaResponse, ErrorInfo } from '../../types/types';
-
 import { List } from 'antd';
 
-const TodosList: React.FC<{
-    todosData: MetaResponse<Todo, TodoInfo>;
-    isLoading: boolean;
-    refreshData: () => Promise<void>;
-    setErrorInfo: (error: ErrorInfo) => void;
+import { useAppSelector } from '../../store/hooks';
 
-}> = ({ todosData, refreshData, isLoading, setErrorInfo }) => {
-    
+const TodosList: React.FC = () => {
+
+    const isLoading = useAppSelector((state) => state.ui.isLoading);
+    const todosData = useAppSelector((state) => state.todos.todosData);
+
     return (
         <>
             {isLoading && <p className={classes.loadingText}>Загрузочка...</p>}
@@ -26,8 +23,6 @@ const TodosList: React.FC<{
                     <TodoItem
                         key={todo.id}
                         todo={todo}
-                        refreshData={refreshData}
-                        setErrorInfo={setErrorInfo}
                     />
                 </List.Item>}
             />

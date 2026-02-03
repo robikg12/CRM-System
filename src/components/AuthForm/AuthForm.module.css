@@ -1,0 +1,161 @@
+.overflowCircle {
+    position: absolute;
+    display: block;
+    z-index: 2;
+    width: 167px;
+    height: 167px;
+    left: -100px;
+    bottom: -40px;
+}
+
+.formSectionWrapper {
+    position: relative;
+    width: 42%;
+    padding: 0px 0px 75px 0px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.formWrapper {
+    width: 420px;
+    height: 100%;
+    /* background-color: burlywood; */
+}
+
+.formWrapper h1 {
+    font-family: NunitoSans;
+    font-size: 36px;
+    font-weight: 700;
+    color: #525252;
+    margin: 36px 0px 3px 27px;
+    padding: 0px;
+}
+
+.formWrapper p {
+    font-family: NunitoSans;
+    font-size: 16px;
+    font-weight: 400;
+    color: #525252;
+    margin: 0px 0px 36px 27px;
+}
+
+.formWrapper label {
+    font-family: NunitoSans;
+    font-size: 14px;
+    font-weight: 600;
+    color: #828282;
+    margin-bottom: 4px;
+}
+
+.formWrapper input {
+    width: 100%;
+    height: 45px;
+    border: 1px solid #DED2D9;
+    border-radius: 5px;
+    padding: 13px 10px 13px 10px;
+    box-sizing: border-box;
+}
+
+.formWrapper input:focus {
+    outline: none;
+}
+
+.wrapperOfCheckboxAndLink {
+    display: flex;
+    width: 100%;
+    margin-top: 8px;
+    padding: 2px 0px 2px 0px;
+}
+
+.wrapperOfCheckboxAndLink input {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #7F265B;
+    margin: 0px;
+    accent-color: #7F265B;
+}
+
+.wrapperOfCheckboxAndLink input:checked {
+    background-color: #7F265B;
+}
+
+.wrapperOfCheckboxAndLink label {
+    font-family: NunitoSans;
+    font-size: 12px;
+    color: #A1A1A1;
+    margin-left: 8px;
+}
+
+.wrapperOfCheckboxAndLink a {
+    font-family: NunitoSans;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7F265B;
+
+    margin-left: auto;
+    text-decoration: none;
+}
+
+.formWrapper button {
+    width: 100%;
+    height: 50px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    margin-top: 30px;
+    padding: 13px 10px 12px 10px;
+    background-color: #7F265B;
+    font-family: NunitoSans;
+    font-weight: 800;
+    font-size: 18px;
+    color: #FFFFFF;
+}
+
+.singupLinkWrapper p {
+    font-family: NunitoSans;
+    font-size: 18px;
+    color: #828282;
+    margin: 0px;
+}
+
+.singupLinkWrapper a {
+    font-family: NunitoSans;
+    font-size: 18px;
+    color: #7F265B;
+
+    margin: 0px 0px 0px 10px;
+}
+
+.singupLinkWrapper {
+    display: flex;
+}
+
+.formWrapper input:first-of-type {
+    margin-bottom: 24px;
+}
+
+.errorBlock {
+    width: 100%;
+    height: auto;
+    margin: 10px 0px 0px 0px;
+    padding: 16px 12px 16px 12px;
+    border-radius: 4px 4px 4px 4px;
+    background-color: #ffb8b8;
+    box-sizing: border-box;
+    color: black;
+    font-size: 16px;
+    font-family: NunitoSans;
+}
+
+.successfulRegistrationBlock {
+    width: 100%;
+    height: auto;
+    margin: 10px 0px 0px 0px;
+    padding: 16px 12px 16px 12px;
+    box-sizing: border-box;
+    color: black;
+    font-size: 16px;
+    font-family: NunitoSans;
+}

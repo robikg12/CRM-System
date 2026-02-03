@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { editItem, deleteItem } from '../../api/https';
 
-import type { Todo, TodoRequest, ErrorInfo } from '../../types/types';
+import type { Todo, TodoRequest } from '../../types/types';
 
 import classes from './TodoItem.module.css';
 
@@ -9,18 +9,22 @@ import { Card, Flex, Checkbox, Button, Input, Form } from 'antd';
 import type { CheckboxProps, FormProps } from 'antd';
 import { StopOutlined, FormOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
 
+import { useAppDispatch } from '../../store/hooks';
+import { uiActions } from '../../store/ui-slice';
+
+import { refreshTodosData } from '../../store/todos-actions.ts';
+
+import { MIN_TODO_TITLE_LENGHT, MAX_TODO_TITLE_LENGHT } from '../../validation.ts';
+
 type FieldType = {
     title: string;
 }
 
 const TodoItem: React.FC<{
     todo: Todo;
-    refreshData: () => Promise<void>;
-    setErrorInfo: (error: ErrorInfo) => void;
+}> = ({ todo }) => {
 
-}> = ({ todo, refreshData, setErrorInfo }) => {
-
-
+    const dispatch = useAppDispatch();
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [editedTitle, setEditedTitle] = useState<string>(todo.title);
@@ -34,15 +38,15 @@ const TodoItem: React.FC<{
             const newStatus = e.target.checked;
             const todoRequest: TodoRequest = { isDone: newStatus, title: todo.title };
             await editItem(todo.id, todoRequest);
-            await refreshData();
+            await dispatch(refreshTodosData());
             setIsLoading(false);
         }
         catch (error) {
             if (error instanceof Error) {
-                setErrorInfo({
+                dispatch(uiActions.setErrorInfo({
                     isActiveError: true,
                     message: error.message
-                });
+                }));
             }
         }
     };
@@ -61,16 +65,16 @@ const TodoItem: React.FC<{
             setIsLoading(true);
             const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
             await editItem(todo.id, todoRequest);
-            await refreshData();
+            await dispatch(refreshTodosData());
             setIsLoading(false);
             setIsEditing(false);
         }
         catch (error) {
             if (error instanceof Error) {
-                setErrorInfo({
+                dispatch(uiActions.setErrorInfo({
                     isActiveError: true,
                     message: error.message
-                });
+                }));
             }
         }
     };
@@ -87,15 +91,15 @@ const TodoItem: React.FC<{
         try {
             setIsLoading(true);
             await deleteItem(todo.id);
-            await refreshData();
+            await dispatch(refreshTodosData());
             setIsLoading(false);
         }
         catch (error) {
             if (error instanceof Error) {
-                setErrorInfo({
+                dispatch(uiActions.setErrorInfo({
                     isActiveError: true,
                     message: error.message
-                });
+                }));
             }
         }
     }
@@ -121,7 +125,7 @@ const TodoItem: React.FC<{
                             style={{ flexGrow: 1, marginTop: "20px" }} //как я понял обёртки Form.item сбивают flex align center для этих элементов, самый простой способ который придумал - добавить margin
                             rules={[{ required: true, message: 'Введите задачу' },
                             { whitespace: true, message: "Задача не может быть пустой" },
-                            { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}
+                            { min: MIN_TODO_TITLE_LENGHT, max: MAX_TODO_TITLE_LENGHT, message: 'Задача должна содержать от 2 до 64 символов' }]}
                             name='title'>
 
                             <Input

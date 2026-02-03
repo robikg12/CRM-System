@@ -4,7 +4,9 @@ import RootLayout from './pages/RootLayout';
 
 import ErrorPage from './pages/ErrorPage';
 import TodoListPage from "./pages/TodoListPage";
-import ProfilePage from './pages/ProfilePage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
+import AuthLayout from './pages/AuthLayout/AuthLayout'
+import AuthForm from "./components/AuthForm/AuthForm";
 
 function App() {
 
@@ -23,6 +25,15 @@ function App() {
           element: <ProfilePage />
         }
       ],
+    },
+    {
+      element: < AuthLayout />,
+      children: [
+        {
+          path: '/authentication',
+          element: <AuthForm />
+        }
+      ]
     }
   ]);
 

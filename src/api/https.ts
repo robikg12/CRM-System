@@ -1,9 +1,14 @@
-import type { MetaResponse, Todo, Category, TodoInfo, TodoRequest } from '../types/types';
+import axios, { isAxiosError } from 'axios';
 
-import axios from 'axios';
+import type {
+    MetaResponse, Todo, Category, TodoInfo,
+    TodoRequest, UserRegistration, ClientSideUserRegistration,
+    Profile, AuthData, Token,
+    ErrorInfo
+} from '../types/types';
 
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
     baseURL: 'https://easydev.club/api/v1'
 });
 
@@ -61,3 +66,124 @@ export async function deleteItem(id: number): Promise<void> {
     }
 }
 
+export async function registerNewUser(registrationData: ClientSideUserRegistration): Promise<Profile | ErrorInfo> {
+
+    try {
+        const { login, username, password, email, phoneNumber } = registrationData;
+        const registrationDataForRequest: UserRegistration = { login, username, password, email, phoneNumber };
+
+        const response = await apiClient.post('/auth/signup', registrationDataForRequest);
+        return response.data;
+    }
+
+    catch (error) {
+        if (isAxiosError(error)) {
+            if (error.response?.status === 400) {
+                return {
+                    isActiveError: true,
+                    message: `Invalid input`
+                }
+            }
+            if (error.response?.status === 409) {
+                return {
+                    isActiveError: true,
+                    message: `User already exist.`
+                }
+            }
+            if (error.response?.status === 500) {
+                return {
+                    isActiveError: true,
+                    message: `Server error /Internal error.`
+                }
+            }
+        }
+        return {
+            isActiveError: true,
+            message: `Error =/`
+        }
+    }
+}
+
+export async function userAuthentication(authData: AuthData): Promise<Token | ErrorInfo> {
+
+    try {
+        const response = await apiClient.post('/auth/signin', authData);
+        return response.data;
+    }
+
+    catch (error) {
+        if (isAxiosError(error)) {
+            if (error.response?.status === 400) {
+                return {
+                    isActiveError: true,
+                    message: `Incorrect login or password`
+                }
+            }
+            if (error.response?.status === 401) {
+                return {
+                    isActiveError: true,
+                    message: `Invalid credentials.`
+                }
+            }
+            if (error.response?.status === 500) {
+                return {
+                    isActiveError: true,
+                    message: `Server error /Internal error.`
+                }
+            }
+        }
+        return {
+            isActiveError: true,
+            message: `Error =/`
+        }
+    }
+
+}
+
+export async function getUserProfile(accessToken: string): Promise<Profile> {
+
+    try {
+        const response = await apiClient.get('/user/profile', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function refreshAccessToken(refreshToken: string): Promise<Token> {
+
+    try {
+        const response = await apiClient.post('/auth/refresh', { refreshToken: refreshToken });
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+
+}
+export async function userLogout(accessToken: string) {
+    try {
+        await apiClient.post('/user/logout', {}, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+    }
+    catch (error) {
+        if (isAxiosError(error)) {
+            if (error.response?.status === 401) {
+                return 'User context not found.'
+            }
+            if (error.response?.status === 500) {
+                return 'Internal error.'
+            }
+        }
+        return 'Error =/'
+    }
+}

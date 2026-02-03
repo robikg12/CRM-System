@@ -1,0 +1,39 @@
+@font-face {
+    font-family: NunitoSans;
+    src: url(../../assets/fonts/NunitoSans.ttf);
+}
+
+.pageWrapper {
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    display: flex;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+.illustrationWrapper {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    width: 58%;
+    height: 100vh;
+    background-color: #FFE6C9;
+    overflow-y: hidden;
+    z-index: 1;
+}
+
+.illustrationWrapper svg {
+    object-fit: cover;
+}
+
+.illustrationWrapper img {
+    position: absolute;
+    display: block;
+    z-index: 2;
+    width: 297px;
+    height: 293px;
+    top: -74px;
+    left: -80px;
+}
