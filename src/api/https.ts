@@ -140,7 +140,7 @@ export async function userAuthentication(authData: AuthData): Promise<Token | Er
 
 }
 
-export async function getUserProfile(accessToken: string): Promise<Profile> {
+export async function getUserProfile(accessToken: string): Promise<Profile | 'ACCESS-TOKEN-EXPIRED' | 'Server side error' | 'Error'> {
 
     try {
         const response = await apiClient.get('/user/profile', {
@@ -148,24 +148,39 @@ export async function getUserProfile(accessToken: string): Promise<Profile> {
                 'Authorization': `Bearer ${accessToken}`
             }
         });
-
         return response.data;
     }
     catch (error) {
-        throw error;
+        if (isAxiosError(error)) {
+            if (error.response?.status === 401 || error.response?.status === 400) {
+                return 'ACCESS-TOKEN-EXPIRED'
+            }
+            if (error.response?.status === 500) {
+                return 'Server side error'
+            }
+        }
+        return 'Error'
     }
 }
 
-export async function refreshAccessToken(refreshToken: string): Promise<Token> {
+export async function refreshAccessToken(refreshToken: string): Promise<Token | 'REFRESH-TOKEN-EXPIRED' | 'Server side error' | 'Error'> {
 
     try {
         const response = await apiClient.post('/auth/refresh', { refreshToken: refreshToken });
         return response.data;
     }
     catch (error) {
-        throw error;
-    }
 
+        if (isAxiosError(error)) {
+            if (error.response?.status === 401 || error.response?.status === 400) {
+                return 'REFRESH-TOKEN-EXPIRED'
+            }
+            if (error.response?.status === 500) {
+                return 'Server side error'
+            }
+        }
+        return 'Error'
+    }
 }
 export async function userLogout(accessToken: string) {
     try {

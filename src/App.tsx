@@ -6,7 +6,8 @@ import ErrorPage from './pages/ErrorPage';
 import TodoListPage from "./pages/TodoListPage";
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import AuthLayout from './pages/AuthLayout/AuthLayout'
-import AuthForm from "./components/AuthForm/AuthForm";
+import AuthenticationPage from "./pages/AuthenticationPage/AuthenticationPage";
+import RegistrationPage from "./pages/RegistrationPage/RegistrationPage";
 
 function App() {
 
@@ -31,7 +32,11 @@ function App() {
       children: [
         {
           path: '/authentication',
-          element: <AuthForm />
+          element: <AuthenticationPage />
+        },
+        {
+          path: '/signup',
+          element: <RegistrationPage />
         }
       ]
     }

@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
 
 import type { Profile } from "../types/types.ts";
 import { getProfile } from './user-actions.ts';
@@ -42,10 +41,16 @@ export const userSlice = createSlice({
                 state.userProfile = response;
                 state.fetchingStatus = 'good';
             }
+            if (response === 'relaunch') {
+                state.fetchingStatus = 'idle';
+            }
         });
         builder.addCase(getProfile.rejected, (state, action) => {
             if (action.payload === 'denied') {
                 state.fetchingStatus = 'denied';
+            }
+            else if (action.payload === 'error') {
+                state.fetchingStatus = 'idle';
             }
         });
     }

@@ -1,23 +1,6 @@
-.overflowCircle {
-    position: absolute;
-    display: block;
-    z-index: 2;
-    width: 167px;
-    height: 167px;
-    left: -100px;
-    bottom: -40px;
-}
-
-.formSectionWrapper {
-    position: relative;
-    width: 42%;
-    padding: 0px 0px 75px 0px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-sizing: border-box;
-}
+/* Тут такое дело, раньше и авторизация и регистрация были в одном компоненте, с одним css файлом.
+Потом почитал повнимательнее, что должно быть 2 страницы - для авторизации и регистрации. Вообщем просто 
+скопировал стили в 2 файла, на тяп-ляп написал css. Надеюсь, что на css'е нет такой важности */
 
 .formWrapper {
     width: 420px;
@@ -63,6 +46,43 @@
     outline: none;
 }
 
+.formWrapper button {
+    width: 100%;
+    height: 50px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    margin-top: 30px;
+    padding: 13px 10px 12px 10px;
+    background-color: #7F265B;
+    font-family: NunitoSans;
+    font-weight: 800;
+    font-size: 18px;
+    color: #FFFFFF;
+}
+
+.formWrapper input:first-of-type {
+    margin-bottom: 24px;
+}
+
+
+
+
+
+
+/*  */
+
+
+.overflowCircle {
+    position: absolute;
+    display: block;
+    z-index: 2;
+    width: 167px;
+    height: 167px;
+    left: -100px;
+    bottom: -40px;
+}
+
+
 .wrapperOfCheckboxAndLink {
     display: flex;
     width: 100%;
@@ -99,19 +119,7 @@
     text-decoration: none;
 }
 
-.formWrapper button {
-    width: 100%;
-    height: 50px;
-    box-sizing: border-box;
-    border-radius: 6px;
-    margin-top: 30px;
-    padding: 13px 10px 12px 10px;
-    background-color: #7F265B;
-    font-family: NunitoSans;
-    font-weight: 800;
-    font-size: 18px;
-    color: #FFFFFF;
-}
+
 
 .singupLinkWrapper p {
     font-family: NunitoSans;
@@ -129,12 +137,18 @@
 }
 
 .singupLinkWrapper {
+
     display: flex;
+    justify-content: center;
+    margin-top: 110px;
+    /* =( */
 }
 
-.formWrapper input:first-of-type {
-    margin-bottom: 24px;
+.authDesignIcon {
+    margin-top: 30px;
 }
+
+
 
 .errorBlock {
     width: 100%;
