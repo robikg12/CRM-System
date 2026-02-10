@@ -6,11 +6,11 @@ import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
-import { todosActions } from '../../store/todos-slice.ts';
+import { todosActions } from '../../store/todos/todos-slice.ts';
 
 const TodoFilter: React.FC = () => {
 
-    const counts = useAppSelector((state) => state.todos.todosData.info);
+    const counts = useAppSelector((state) => state.todos.asyncData.data?.info);
 
     const dispatch = useAppDispatch();
 

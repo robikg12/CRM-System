@@ -14,6 +14,8 @@ export const registrationDataValidation = (signupData: ClientSideUserRegistratio
 
     const { login, username, password, repeatedPassword, email, phoneNumber } = signupData;
 
+    //По идее нужно было бы на русском ответы ошибок писать, но когда делал, подумал что нужно на английском, т.к дизайн на нём.
+
     if (!username) {
         return {
             isActiveError: true,
@@ -116,7 +118,6 @@ export const authDataValidation = (authData: AuthData): ErrorInfo => {
             message: 'The password must be between 6 and 60 characters long.'
         }
     }
-
 
     return {
         isActiveError: false,

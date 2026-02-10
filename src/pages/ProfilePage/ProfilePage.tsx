@@ -1,42 +1,57 @@
 import classes from './ProfilePage.module.css';
 
+import { useNavigate } from 'react-router';
+
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
-import { getProfile } from '../../store/user-actions';
-import { uiActions } from '../../store/ui-slice';
-import { userActions } from "../../store/user-slice";
-import { userLogout } from '../../api/https';
+import { refreshAccessToken, userLogout } from '../../api/https';
+
+import { userActions } from '../../store/user/user-slice';
+import { uiActions } from '../../store/ui/ui-slice';
 
 const ProfilePage: React.FC = () => {
 
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    const profileData = useAppSelector((state) => state.user.userProfile);
+    const profileData = useAppSelector((state) => state.user.asyncData.data);
 
     const handleLogout = async () => {
-        await dispatch(getProfile()); //Добавил, чтобы убедиться, что access-токен свежий, хотя, наверное лишнее.
+        const refreshToken = localStorage.getItem('refreshToken');
 
-        const accessToken = localStorage.getItem('accessToken');
-        if (accessToken) {
-            const errorResponse = await userLogout(accessToken);
-            if (!errorResponse) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                dispatch(userActions.setDeniedStatus());
-                return
-            }
-            dispatch(uiActions.setErrorInfo({ isActiveError: true, message: errorResponse }));
+        if (!refreshToken) { //на всякий случай
+            dispatch(userActions.setIsAuthorized(false));
+            return navigate('/authentication');
+        }
+
+        try {
+            const tokens = await refreshAccessToken(refreshToken);
+            localStorage.setItem('refreshToken', tokens.refreshToken);
+
+            await userLogout(tokens.accessToken);
+            dispatch(userActions.setIsAuthorized(false));
+            localStorage.removeItem('refreshToken');
+            return navigate('/authentication');
+        }
+        catch (error) {
+            dispatch(uiActions.setErrorInfo({
+                isActiveError: true,
+                message: error as string
+            }));
+            localStorage.removeItem('refreshToken');
+            dispatch(userActions.setIsAuthorized(false));
+            return navigate('/authentication');
         }
     }
 
     return <><h1 style={{ marginLeft: '500px' }} >
         привет
     </ h1>
-        <div>
+        {profileData && <div>
             <p>Твоё имя: {profileData.username}</p>
             <p>Твоя почта: {profileData.email}</p>
             <p>Твой номер телефона: {profileData.phoneNumber}</p>
-        </div>
+        </div>}
         <button onClick={handleLogout} className={classes.logoutButton}>Logout</button>
     </>
 }

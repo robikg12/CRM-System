@@ -9,16 +9,12 @@ import { useState, useEffect } from 'react';
 import type { AuthData } from '../../types/types';
 
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { uiActions } from '../../store/ui-slice';
-import { userActions } from '../../store/user-slice';
+import { uiActions } from '../../store/ui/ui-slice';
+import { userActions } from '../../store/user/user-slice';
 
 import { authDataValidation } from '../../validation';
 
 import { userAuthentication } from '../../api/https';
-
-
-
-
 
 
 const initialAuthData: AuthData = {
@@ -46,7 +42,7 @@ const AuthenticationPage: React.FC = () => {
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        dispatch(userActions.setIdleStatus());
+        dispatch(userActions.setIdleStatus()); //Костыль, чтобы если сделаю логаут, то статус встал обратно в idle.
 
         const errorInformation = authDataValidation(loginInputData);
         dispatch(uiActions.setAuthErrorInfo(errorInformation));
@@ -56,8 +52,7 @@ const AuthenticationPage: React.FC = () => {
 
         const authResponse = await userAuthentication(loginInputData);
 
-        if ("accessToken" in authResponse) {
-            localStorage.setItem('accessToken', authResponse.accessToken);
+        if ("refreshToken" in authResponse) {
             localStorage.setItem('refreshToken', authResponse.refreshToken);
 
             dispatch(uiActions.setAuthErrorInfo({

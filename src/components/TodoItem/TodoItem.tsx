@@ -10,9 +10,9 @@ import type { CheckboxProps, FormProps } from 'antd';
 import { StopOutlined, FormOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
 
 import { useAppDispatch } from '../../store/hooks';
-import { uiActions } from '../../store/ui-slice';
+import { uiActions } from '../../store/ui/ui-slice.ts';
 
-import { refreshTodosData } from '../../store/todos-actions.ts';
+import { refreshTodosData } from '../../store/todos/todos-actions.ts';
 
 import { MIN_TODO_TITLE_LENGHT, MAX_TODO_TITLE_LENGHT } from '../../validation.ts';
 

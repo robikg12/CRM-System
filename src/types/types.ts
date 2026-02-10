@@ -64,3 +64,5 @@ export interface Token {
 }
 
 export type Role = 'ADMIN' | 'USER' | 'MODERATOR';
+
+

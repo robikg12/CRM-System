@@ -10,7 +10,7 @@ import { Link } from 'react-router';
 
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 
-import { uiActions } from '../../store/ui-slice';
+import { uiActions } from '../../store/ui/ui-slice';
 
 import { registrationDataValidation } from '../../validation';
 import { registerNewUser } from '../../api/https';
@@ -52,8 +52,7 @@ const RegistrationPage: React.FC = () => {
         if (errorInformation.isActiveError) {
             return;
         }
-
-        console.log(signupInputData);
+        
         const resData = await registerNewUser(signupInputData);
         if ('isActiveError' in resData) {
             dispatch(uiActions.setAuthErrorInfo(resData));

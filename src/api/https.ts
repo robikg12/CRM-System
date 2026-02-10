@@ -23,7 +23,7 @@ export async function fetchTodosData(category: Category): Promise<MetaResponse<T
         return response.data;
     }
     catch (error) {
-        throw new Error(`Не удалось получить записи списка задач по категории`);
+        throw `Не удалось получить записи списка задач по категории`;
     }
 }
 
@@ -140,7 +140,7 @@ export async function userAuthentication(authData: AuthData): Promise<Token | Er
 
 }
 
-export async function getUserProfile(accessToken: string): Promise<Profile | 'ACCESS-TOKEN-EXPIRED' | 'Server side error' | 'Error'> {
+export async function fetchUserProfile(accessToken: string): Promise<Profile> {
 
     try {
         const response = await apiClient.get('/user/profile', {
@@ -153,17 +153,17 @@ export async function getUserProfile(accessToken: string): Promise<Profile | 'AC
     catch (error) {
         if (isAxiosError(error)) {
             if (error.response?.status === 401 || error.response?.status === 400) {
-                return 'ACCESS-TOKEN-EXPIRED'
+                throw 'ACCESS-TOKEN-EXPIRED'
             }
             if (error.response?.status === 500) {
-                return 'Server side error'
+                throw 'Server side error'
             }
         }
-        return 'Error'
+        throw 'Error'
     }
 }
 
-export async function refreshAccessToken(refreshToken: string): Promise<Token | 'REFRESH-TOKEN-EXPIRED' | 'Server side error' | 'Error'> {
+export async function refreshAccessToken(refreshToken: string): Promise<Token> {
 
     try {
         const response = await apiClient.post('/auth/refresh', { refreshToken: refreshToken });
@@ -173,16 +173,17 @@ export async function refreshAccessToken(refreshToken: string): Promise<Token | 
 
         if (isAxiosError(error)) {
             if (error.response?.status === 401 || error.response?.status === 400) {
-                return 'REFRESH-TOKEN-EXPIRED'
+                throw 'REFRESH-TOKEN-EXPIRED'
             }
             if (error.response?.status === 500) {
-                return 'Server side error'
+                throw 'Server side error'
             }
         }
-        return 'Error'
+        throw 'Error'
     }
 }
 export async function userLogout(accessToken: string) {
+
     try {
         await apiClient.post('/user/logout', {}, {
             headers: {
@@ -193,12 +194,17 @@ export async function userLogout(accessToken: string) {
     catch (error) {
         if (isAxiosError(error)) {
             if (error.response?.status === 401) {
-                return 'User context not found.'
+                throw 'User context not found.'
             }
             if (error.response?.status === 500) {
-                return 'Internal error.'
+                throw 'Internal error.'
             }
         }
-        return 'Error =/'
+        throw 'Error =/'
     }
 }
+
+
+
+
+

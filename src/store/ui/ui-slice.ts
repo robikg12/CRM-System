@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { ErrorInfo } from "../types/types.ts";
+import type { ErrorInfo } from "../../types/types.ts";
 
 interface uiState {
     isLoading: boolean;
@@ -25,9 +25,6 @@ export const uiSlice = createSlice({
     name: 'ui',
     initialState,
     reducers: {
-        setIsLoading: (state, action: PayloadAction<boolean>) => {
-            state.isLoading = action.payload;
-        },
         setErrorInfo: (state, action: PayloadAction<ErrorInfo>) => {
             state.errorInfo = action.payload;
         },
