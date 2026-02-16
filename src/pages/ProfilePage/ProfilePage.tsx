@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
-import { userLogout } from '../../api/https';
+import { userLogout, refreshTokens } from '../../api/https';
 
 import { userActions } from '../../store/user/userSlice';
 import { uiActions } from '../../store/ui/uiSlice';
@@ -18,19 +18,19 @@ const ProfilePage: React.FC = () => {
 
     const handleLogout = async () => {
 
-        const accessToken = localStorage.getItem('accessToken')
         const refreshToken = localStorage.getItem('refreshToken');
 
-        if (!refreshToken || !accessToken) { //на всякий случай
+        if (!refreshToken) { //на всякий случай
             dispatch(userActions.setIsAuthorized(false));
+            localStorage.removeItem('refreshToken');
             return navigate('/authentication');
         }
 
         try {
-
-            await userLogout(accessToken);
-            dispatch(userActions.setIsAuthorized(false));
+            const tokens = await refreshTokens(refreshToken);
+            await userLogout(tokens.accessToken);
             localStorage.removeItem('refreshToken');
+            dispatch(userActions.setIsAuthorized(false));
             return navigate('/authentication');
         }
         catch (error) {
