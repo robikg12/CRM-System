@@ -8,10 +8,10 @@ import { useNavigate } from "react-router-dom";
 
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 
-import { refreshAccessToken } from '../api/https.ts';
+import { refreshTokens } from '../api/https.ts';
 
-import { getProfile } from "../store/user/user-actions";
-import { userActions } from "../store/user/user-slice";
+import { getProfile } from "../store/user/userActions.ts";
+import { userActions } from "../store/user/userSlice.ts";
 
 import { notification } from 'antd';
 type NotificationType = 'success' | 'info' | 'warning' | 'error';
@@ -38,7 +38,7 @@ const RootLayout: React.FC = () => {
         }
 
         try {
-            const tokens = await refreshAccessToken(refreshToken);
+            const tokens = await refreshTokens(refreshToken);
             localStorage.setItem('refreshToken', tokens.refreshToken);
 
             await dispatch(getProfile(tokens.accessToken));

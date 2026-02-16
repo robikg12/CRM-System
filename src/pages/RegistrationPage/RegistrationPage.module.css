@@ -5,7 +5,7 @@
 .formWrapper {
     width: 420px;
     height: 100%;
-    /* background-color: burlywood; */
+    box-sizing: border-box;
 }
 
 .formWrapper h1 {
@@ -170,4 +170,9 @@
     color: black;
     font-size: 16px;
     font-family: NunitoSans;
+}
+
+form div {
+    /* Вынужден был добавить !important, чтобы перебить antd */
+    margin-bottom: 0px !important;
 }

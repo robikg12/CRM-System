@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { refreshTodosData } from '../store/todos/todos-actions';
+import { refreshTodosData } from '../store/todos/todosActions';
 
 
 

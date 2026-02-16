@@ -3,67 +3,60 @@ import classes from './RegistrationPage.module.css';
 import AuthDesignIcon from '../../assets/img/icons/AuthenticationDesignIcon.svg?react';
 import OverflowCircle from '../../assets/img/design/Authentication/overflowCircle.svg?react';
 
-import type { ClientSideUserRegistration } from '../../types/types';
+import type { UserRegistrationData } from '../../types/types';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router';
 
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 
-import { uiActions } from '../../store/ui/ui-slice';
+import { uiActions } from '../../store/ui/uiSlice';
 
 import { registrationDataValidation } from '../../validation';
 import { registerNewUser } from '../../api/https';
 
+import type { FormProps } from 'antd';
+import { Form, Input } from 'antd';
+import FormItem from 'antd/es/form/FormItem';
 
 
-const initialSignupData: ClientSideUserRegistration = {
-    login: '',
-    username: '',
-    password: '',
-    repeatedPassword: '',
-    email: '',
-    phoneNumber: ''
-};
+
+
 
 const RegistrationPage: React.FC = () => {
 
     const dispatch = useAppDispatch();
 
-    const [signupInputData, setSignupInputFields] = useState<ClientSideUserRegistration>(initialSignupData); // TODO: подумать над названием стейта
+
     const errorInfo = useAppSelector(state => state.ui.authErrorInfo);
 
-    const handleChangeSignupData = (event: React.ChangeEvent<HTMLInputElement>, input: string) => {
+    const handleSignup: FormProps<UserRegistrationData>['onFinish'] = async (signupData) => {
 
-        if (input in signupInputData) {
-            setSignupInputFields((prevData) => ({
-                ...prevData,
-                [input]: event.target.value
+        try {
+            const errorInformation = registrationDataValidation(signupData);
+            dispatch(uiActions.setAuthErrorInfo(errorInformation));
+            if (errorInformation.isActiveError) {
+                return;
+            }
+
+            delete signupData.repeatedPassword;
+            await registerNewUser(signupData);
+
+            dispatch(uiActions.setAuthErrorInfo({
+                isActiveError: false,
+                message: 'Registration was successful'
             }));
+
+        } catch (errorMessage) {
+
+            dispatch(uiActions.setAuthErrorInfo(
+                {
+                    isActiveError: true,
+                    message: errorMessage as string
+                }
+            ));
         }
-    }
-
-
-    const handleSignup = async (event: React.FormEvent) => {
-        event.preventDefault();
-
-        const errorInformation = registrationDataValidation(signupInputData);
-        dispatch(uiActions.setAuthErrorInfo(errorInformation));
-        if (errorInformation.isActiveError) {
-            return;
-        }
-        
-        const resData = await registerNewUser(signupInputData);
-        if ('isActiveError' in resData) {
-            dispatch(uiActions.setAuthErrorInfo(resData));
-            return;
-        }
-        dispatch(uiActions.setAuthErrorInfo({
-            isActiveError: false,
-            message: 'Registration was successful'
-        }));
-
-    }
+    };
 
     useEffect(() => {
         dispatch(uiActions.setAuthErrorInfo({
@@ -74,7 +67,6 @@ const RegistrationPage: React.FC = () => {
 
     return <>
 
-
         <div className={classes.formWrapper}>
 
             <AuthDesignIcon className={classes.authDesignIcon} />
@@ -82,27 +74,46 @@ const RegistrationPage: React.FC = () => {
             <h1>Create your account</h1>
 
             {(errorInfo.message !== 'Registration was successful') &&
-                <form onSubmit={handleSignup}>
+                <Form onFinish={handleSignup}>
                     <label htmlFor="name">Your name *</label>
-                    <input value={signupInputData.username} type="text" id="name" onChange={(event) => { handleChangeSignupData(event, 'username') }} />
+                    <FormItem<UserRegistrationData>
+                        name="username">
+                        <Input id="name" />
+                    </FormItem>
 
                     <label htmlFor="login">Login *</label>
-                    <input value={signupInputData.login} type="text" id="login" onChange={(event) => { handleChangeSignupData(event, 'login') }} />
+                    <FormItem<UserRegistrationData>
+                        name="login">
+                        <Input id="login" />
+                    </FormItem>
 
                     <label htmlFor="pwd">Password *</label>
-                    <input value={signupInputData.password} type="password" id="pwd" onChange={(event) => { handleChangeSignupData(event, 'password') }} />
+                    <FormItem<UserRegistrationData>
+                        name="password">
+                        <Input type="password" id="pwd" />
+                    </FormItem>
 
                     <label htmlFor="repeat-pwd">Repeat password *</label>
-                    <input value={signupInputData.repeatedPassword} type="password" id="repeat-pwd" onChange={(event) => { handleChangeSignupData(event, 'repeatedPassword') }} />
+                    <FormItem<UserRegistrationData>
+                        name="repeatedPassword">
+                        <Input type="password" id="repeat-pwd" />
+                    </FormItem>
+
 
                     <label htmlFor="email">Email *</label>
-                    <input value={signupInputData.email} type="email" id="email" onChange={(event) => { handleChangeSignupData(event, 'email') }} />
+                    <FormItem<UserRegistrationData>
+                        name="email">
+                        <Input type="email" id="email" />
+                    </FormItem>
 
                     <label htmlFor="tel">Phone number</label>
-                    <input value={signupInputData.phoneNumber} type="tel" id="tel" onChange={(event) => { handleChangeSignupData(event, 'phoneNumber') }} />
+                    <FormItem<UserRegistrationData>
+                        name="phoneNumber">
+                        <Input type="tel" id="tel" />
+                    </FormItem>
 
                     <button type="submit">Signup</button>
-                </form>}
+                </Form>}
 
 
             {errorInfo.isActiveError && <div className={classes.errorBlock}>

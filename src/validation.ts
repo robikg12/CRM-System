@@ -1,4 +1,4 @@
-import type { ClientSideUserRegistration, AuthData, ErrorInfo } from './types/types.ts';
+import type { UserRegistrationData, AuthData, ErrorInfo } from './types/types.ts';
 
 export const MIN_TODO_TITLE_LENGHT = 2;
 export const MAX_TODO_TITLE_LENGHT = 64;
@@ -10,7 +10,7 @@ const isEngLettersRegexp = /^[a-zA-Z]+$/;
 const isValidEmailRegexp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const isValidRusPhoneRegexp = /^\+?(7|8)\s?(\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2})$/;
 
-export const registrationDataValidation = (signupData: ClientSideUserRegistration): ErrorInfo => {
+export const registrationDataValidation = (signupData: UserRegistrationData): ErrorInfo => {
 
     const { login, username, password, repeatedPassword, email, phoneNumber } = signupData;
 
@@ -75,7 +75,7 @@ export const registrationDataValidation = (signupData: ClientSideUserRegistratio
         }
     }
 
-    if (phoneNumber.length > 0 && !isValidRusPhoneRegexp.test(phoneNumber)) {
+    if (phoneNumber && phoneNumber.length > 0 && !isValidRusPhoneRegexp.test(phoneNumber)) {
         return {
             isActiveError: true,
             message: 'If you enter a phone number, it must be valid.'

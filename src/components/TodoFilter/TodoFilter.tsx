@@ -6,7 +6,7 @@ import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
-import { todosActions } from '../../store/todos/todos-slice.ts';
+import { todosActions } from '../../store/todos/todosSlice.ts';
 
 const TodoFilter: React.FC = () => {
 

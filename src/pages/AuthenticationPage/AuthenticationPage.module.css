@@ -164,3 +164,7 @@
 .authDesignIcon {
     margin-top: 150px;
 }
+form div {
+    /* Вынужден был добавить !important, чтобы перебить antd */
+    margin-bottom: 0px !important;
+}

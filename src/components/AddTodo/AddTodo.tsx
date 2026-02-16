@@ -8,9 +8,9 @@ import { Button, Form, Input, Flex } from 'antd';
 import type { FormProps } from 'antd';
 
 import { useAppDispatch } from '../../store/hooks';
-import { uiActions } from '../../store/ui/ui-slice.ts';
+import { uiActions } from '../../store/ui/uiSlice.ts';
 
-import { refreshTodosData } from '../../store/todos/todos-actions.ts';
+import { refreshTodosData } from '../../store/todos/todosActions.ts';
 
 import { MIN_TODO_TITLE_LENGHT, MAX_TODO_TITLE_LENGHT } from '../../validation.ts';
 

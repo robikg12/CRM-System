@@ -5,7 +5,7 @@ import classes from './AuthLayout.module.css';
 
 //Сначала пытался разместить картинку правильным способом для svg, но почему-то не отображались на ней некоторые 
 //должные элементы (не те которые png, те которые png добавил отдельно), поэтому svg картинку добавил через обычный img
-import AuthIllustrationn from '../../assets/img/design/Authentication/authenticationIllustration.svg';
+import authIllustration from '../../assets/img/design/Authentication/authenticationIllustration.svg';
 import bigCirlce from '../../assets/img/design/Authentication/bigCircle.png';
 import centerCircle from '../../assets/img/design/Authentication/centerCircleImage.png';
 
@@ -13,7 +13,7 @@ const AuthLayout: React.FC = () => {
 
     return <div className={classes.pageWrapper}>
         <div className={classes.illustrationWrapper}>
-            <img src={AuthIllustrationn} className={classes.mainIllustration} />
+            <img src={authIllustration} className={classes.mainIllustration} alt="" />
             <img src={bigCirlce} className={classes.leftTopCircle} alt="" />
             <img src={centerCircle} className={classes.centerCircle} alt="" />
 

@@ -31,10 +31,11 @@ export interface ErrorInfo {
     message: string;
 }
 
-export interface UserRegistration {
+export interface UserRegistrationData {
     login: string;
-    username: string; //подумать как перевести "логин"
+    username: string;
     password: string;
+    repeatedPassword?: string;
     email: string;
     phoneNumber: string;
 }
@@ -42,10 +43,6 @@ export interface UserRegistration {
 export interface AuthData {
     login: string;
     password: string;
-}
-
-export interface ClientSideUserRegistration extends UserRegistration {
-    repeatedPassword: string;
 }
 
 export interface Profile {
@@ -58,7 +55,7 @@ export interface Profile {
     phoneNumber: string;
 }
 
-export interface Token {
+export interface Tokens {
     accessToken: string
     refreshToken: string
 }

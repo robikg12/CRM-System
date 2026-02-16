@@ -2,9 +2,8 @@ import axios, { isAxiosError } from 'axios';
 
 import type {
     MetaResponse, Todo, Category, TodoInfo,
-    TodoRequest, UserRegistration, ClientSideUserRegistration,
-    Profile, AuthData, Token,
-    ErrorInfo
+    TodoRequest, UserRegistrationData,
+    Profile, AuthData, Tokens
 } from '../types/types';
 
 
@@ -66,45 +65,31 @@ export async function deleteItem(id: number): Promise<void> {
     }
 }
 
-export async function registerNewUser(registrationData: ClientSideUserRegistration): Promise<Profile | ErrorInfo> {
+export async function registerNewUser(registrationData: UserRegistrationData): Promise<Profile> {
 
     try {
-        const { login, username, password, email, phoneNumber } = registrationData;
-        const registrationDataForRequest: UserRegistration = { login, username, password, email, phoneNumber };
 
-        const response = await apiClient.post('/auth/signup', registrationDataForRequest);
+        const response = await apiClient.post('/auth/signup', registrationData);
         return response.data;
     }
 
     catch (error) {
         if (isAxiosError(error)) {
             if (error.response?.status === 400) {
-                return {
-                    isActiveError: true,
-                    message: `Invalid input`
-                }
+                throw 'Invalid input'
             }
             if (error.response?.status === 409) {
-                return {
-                    isActiveError: true,
-                    message: `User already exist.`
-                }
+                throw 'User already exist.'
             }
             if (error.response?.status === 500) {
-                return {
-                    isActiveError: true,
-                    message: `Server error /Internal error.`
-                }
+                throw 'Server error /Internal error.'
             }
         }
-        return {
-            isActiveError: true,
-            message: `Error =/`
-        }
+        throw 'Error =/'
     }
 }
 
-export async function userAuthentication(authData: AuthData): Promise<Token | ErrorInfo> {
+export async function userAuthentication(authData: AuthData): Promise<Tokens> {
 
     try {
         const response = await apiClient.post('/auth/signin', authData);
@@ -114,28 +99,16 @@ export async function userAuthentication(authData: AuthData): Promise<Token | Er
     catch (error) {
         if (isAxiosError(error)) {
             if (error.response?.status === 400) {
-                return {
-                    isActiveError: true,
-                    message: `Incorrect login or password`
-                }
+                throw 'Incorrect login or password'
             }
             if (error.response?.status === 401) {
-                return {
-                    isActiveError: true,
-                    message: `Invalid credentials.`
-                }
+                throw 'Invalid credentials.'
             }
             if (error.response?.status === 500) {
-                return {
-                    isActiveError: true,
-                    message: `Server error /Internal error.`
-                }
+                throw 'Server error /Internal error.'
             }
         }
-        return {
-            isActiveError: true,
-            message: `Error =/`
-        }
+        throw 'Error =/'
     }
 
 }
@@ -163,7 +136,7 @@ export async function fetchUserProfile(accessToken: string): Promise<Profile> {
     }
 }
 
-export async function refreshAccessToken(refreshToken: string): Promise<Token> {
+export async function refreshTokens(refreshToken: string): Promise<Tokens> {
 
     try {
         const response = await apiClient.post('/auth/refresh', { refreshToken: refreshToken });

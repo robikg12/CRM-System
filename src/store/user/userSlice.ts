@@ -3,7 +3,7 @@ import { userInitialState } from "../initialState.ts";
 
 import { addAsyncBuilderCases } from "../utils.ts";
 
-import { getProfile } from "./user-actions.ts";
+import { getProfile } from "./userActions.ts";
 
 
 

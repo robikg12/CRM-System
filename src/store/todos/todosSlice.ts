@@ -6,7 +6,7 @@ import type { Category } from '../../types/types.ts';
 import { todosInitialState } from '../initialState.ts';
 
 import { addAsyncBuilderCases } from '../utils.ts';
-import { refreshTodosData } from './todos-actions.ts';
+import { refreshTodosData } from './todosActions.ts';
 
 export const todosEntitySlice = createSlice({
     name: 'todos',

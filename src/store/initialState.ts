@@ -1,9 +1,9 @@
 import type { Category, MetaResponse, Profile, Todo, TodoInfo } from "../types/types.ts";
-import type { IAsyncParticle } from "../types/async.ts";
+import type { AsyncParticle } from "../types/async.ts";
 
 
 export interface UserState {
-    asyncData: IAsyncParticle<Profile>;
+    asyncData: AsyncParticle<Profile>;
     isAuthorized: boolean;
 }
 
@@ -18,7 +18,7 @@ export const userInitialState: UserState = {
 };
 
 export interface TodosState {
-    asyncData: IAsyncParticle<MetaResponse<Todo, TodoInfo>>,
+    asyncData: AsyncParticle<MetaResponse<Todo, TodoInfo>>,
     currentCategory: Category
 }
 

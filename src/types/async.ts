@@ -2,18 +2,18 @@ import type { ErrorInfo } from './types.ts';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 
-export interface IAsyncParticle<T> {
+export interface AsyncParticle<T> {
     data: T | null;
     status: 'idle' | 'pending' | 'fulfilled' | 'rejected';
     error: ErrorInfo | null;
     errorCounter: number;
 }
 
-export type TSliceMethod<Response = unknown, Request = void> = ReturnType<
+export type SliceMethod<Response = unknown, Request = void> = ReturnType<
     typeof createAsyncThunk<Response, Request>
 >;
 
-export interface IAsyncDataStatus {
+export interface AsyncDataStatus {
     hasError: boolean;
     isIdle: boolean;
     isLoading: boolean;
