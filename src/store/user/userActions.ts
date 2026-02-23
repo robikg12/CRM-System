@@ -29,7 +29,8 @@ export const checkAuth = createAsyncThunk<void, undefined, { rejectValue: string
     const refreshToken = localStorage.getItem('refreshToken');
 
     if (!refreshToken) {
-        return thunkAPI.rejectWithValue('Отсутствует рефреш токен');
+        //Тут поставил пустую строку, чтобы когда пользователь только зайдёт на сайт - то ему бы не показывало, что отсутствует рефреш токен
+        return thunkAPI.rejectWithValue('');
     }
 
     try {
@@ -49,7 +50,7 @@ export const checkAuth = createAsyncThunk<void, undefined, { rejectValue: string
                 return thunkAPI.rejectWithValue('Токен истёк');
             }
             if (e.response?.status === 500) {
-                return thunkAPI.rejectWithValue('серверная ошибка');
+                return thunkAPI.rejectWithValue('Серверная ошибка');
             }
         }
         return thunkAPI.rejectWithValue('Ошибка =/');

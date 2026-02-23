@@ -23,7 +23,7 @@ const AuthLayout: React.FC = () => {
     const [api, contextHolder] = notification.useNotification();
 
     const error = useAppSelector((state) => state.user.error);
-    
+
     const openNotificationWithIcon = (type: NotificationType) => {
 
         api[type]({
@@ -33,7 +33,7 @@ const AuthLayout: React.FC = () => {
     };
 
     useEffect(() => {
-        if (error.message === 'Серверная ошибка' || error.message === 'Ошибка =/') {
+        if (error.message === 'Серверная ошибка' || error.message === 'Ошибка =/' || error.message === 'Токен истёк') {
 
             openNotificationWithIcon('error');
         }

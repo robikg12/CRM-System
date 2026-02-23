@@ -6,7 +6,9 @@
 .formWrapper {
     width: 420px;
     height: 100vh;
-    padding: 0px 0px 0px 0px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 .formWrapper h1 {
@@ -125,14 +127,14 @@
 
 
 
-.singupLinkWrapper p {
+.authLinkWrapper p {
     font-family: NunitoSans;
     font-size: 18px;
     color: #828282;
     margin: 0px;
 }
 
-.singupLinkWrapper a {
+.authLinkWrapper a {
     font-family: NunitoSans;
     font-size: 18px;
     color: #7F265B;
@@ -140,7 +142,7 @@
     margin: 0px 0px 0px 10px;
 }
 
-.singupLinkWrapper {
+.authLinkWrapper {
     display: flex;
     justify-content: center;
     margin: auto 0px 40px 0px;

@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 import type { Profile, AsyncStatus } from "../../types/types";
 
@@ -41,12 +41,6 @@ export const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        setIsAuthorized: (state, action: PayloadAction<boolean>) => {
-            state.isAuthorized = action.payload;
-        },
-        setIdleStatus: (state) => {
-            state.status = 'idle';
-        }
     },
     extraReducers(builder) {
         builder.addCase(getProfile.fulfilled, (state, action) => {
@@ -115,16 +109,16 @@ export const userSlice = createSlice({
             });
 
         builder.addCase(logout.pending, (state) => {
-            state.status = 'pending';
+            // state.status = 'pending';
+            state.authStatus = 'idle';
         })
             .addCase(logout.fulfilled, (state) => {
                 state.isAuthorized = false;
                 state.profile = initialState.profile;
-                state.status = 'fulfilled' // Проверить, может лучше поставить idle
             })
             .addCase(logout.rejected, (state, action) => {
                 state.isAuthorized = false;
-                state.status = 'rejected';
+                // state.status = 'rejected';
                 state.profile = initialState.profile;
                 if (action.payload) {
                     state.error.message = action.payload;

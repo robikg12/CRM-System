@@ -36,7 +36,7 @@ const AuthenticationPage: React.FC = () => {
 
     useEffect(() => {
 
-        if ((serverError.message) && (serverError.message !== 'Серверная ошибка' && serverError.message !== 'Ошибка =/')) {
+        if ((serverError.message) && (serverError.message !== 'Серверная ошибка' && serverError.message !== 'Ошибка =/' && serverError.message !== 'Токен истёк')) {
             setLocalError(serverError.message);
         }
     }, [serverError.count, serverError])
@@ -87,7 +87,7 @@ const AuthenticationPage: React.FC = () => {
         }
 
 
-        <div className={classes.singupLinkWrapper}>
+        <div className={classes.authLinkWrapper}>
 
             <p>Not Registered Yet?</p>
             <Link to='/signup'>Create an account</Link>
