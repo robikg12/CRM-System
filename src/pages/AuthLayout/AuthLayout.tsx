@@ -1,5 +1,10 @@
 import { Outlet } from "react-router-dom";
 
+import { useEffect } from "react";
+
+import { useAppSelector } from "../../store/hooks";
+
+
 import classes from './AuthLayout.module.css';
 
 
@@ -9,9 +14,34 @@ import authIllustration from '../../assets/img/design/Authentication/authenticat
 import bigCirlce from '../../assets/img/design/Authentication/bigCircle.png';
 import centerCircle from '../../assets/img/design/Authentication/centerCircleImage.png';
 
+import { notification } from 'antd';
+type NotificationType = 'success' | 'info' | 'warning' | 'error';
+
+
+
 const AuthLayout: React.FC = () => {
+    const [api, contextHolder] = notification.useNotification();
+
+    const error = useAppSelector((state) => state.user.error);
+    
+    const openNotificationWithIcon = (type: NotificationType) => {
+
+        api[type]({
+            title: 'Ошибка!',
+            description: error.message
+        });
+    };
+
+    useEffect(() => {
+        if (error.message === 'Серверная ошибка' || error.message === 'Ошибка =/') {
+
+            openNotificationWithIcon('error');
+        }
+
+    }, [error.count]);
 
     return <div className={classes.pageWrapper}>
+        {contextHolder}
         <div className={classes.illustrationWrapper}>
             <img src={authIllustration} className={classes.mainIllustration} alt="" />
             <img src={bigCirlce} className={classes.leftTopCircle} alt="" />

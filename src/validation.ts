@@ -1,14 +1,14 @@
 import type { UserRegistrationData, AuthData, ErrorInfo } from './types/types.ts';
 
-export const MIN_TODO_TITLE_LENGHT = 2;
-export const MAX_TODO_TITLE_LENGHT = 64;
+export const MIN_TODO_TITLE_LENGTH = 2;
+export const MAX_TODO_TITLE_LENGTH = 64;
 
 // Регулярные выражения писал не сам, а загуглил.
 
-const isRusAndEngLettersRegexp = /^[а-яА-ЯёЁa-zA-Z]+$/;
-const isEngLettersRegexp = /^[a-zA-Z]+$/;
+export const isRusAndEngLettersRegexp = /^[а-яА-ЯёЁa-zA-Z]+$/;
+export const isEngLettersRegexp = /^[a-zA-Z]+$/;
 const isValidEmailRegexp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const isValidRusPhoneRegexp = /^\+?(7|8)\s?(\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2})$/;
+export const isValidRusPhoneRegexp = /^\+?(7|8)\s?(\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2})$/;
 
 export const registrationDataValidation = (signupData: UserRegistrationData): ErrorInfo => {
 

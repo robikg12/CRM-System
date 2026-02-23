@@ -5,21 +5,18 @@ import OverflowCircle from '../../assets/img/design/Authentication/overflowCircl
 
 import type { UserRegistrationData } from '../../types/types';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 
-import { uiActions } from '../../store/ui/uiSlice';
 
-import { registrationDataValidation } from '../../validation';
-import { registerNewUser } from '../../api/https';
+import { registration } from '../../store/user/userActions';
 
 import type { FormProps } from 'antd';
 import { Form, Input } from 'antd';
-import FormItem from 'antd/es/form/FormItem';
 
-
+import { isRusAndEngLettersRegexp, isEngLettersRegexp, isValidRusPhoneRegexp } from '../../validation.ts';
 
 
 
@@ -27,43 +24,40 @@ const RegistrationPage: React.FC = () => {
 
     const dispatch = useAppDispatch();
 
+    const registrationServerError = useAppSelector((state) => state.user.error.message);
+    const authStatus = useAppSelector((state) => state.user.authStatus);
 
-    const errorInfo = useAppSelector(state => state.ui.authErrorInfo);
+    const [registrationLocalError, setRegistrationLocalError] = useState<string>('');
+    const [registrationIsSuccessful, setRegistrationIsSuccessful] = useState<boolean>(false);
 
     const handleSignup: FormProps<UserRegistrationData>['onFinish'] = async (signupData) => {
 
-        try {
-            const errorInformation = registrationDataValidation(signupData);
-            dispatch(uiActions.setAuthErrorInfo(errorInformation));
-            if (errorInformation.isActiveError) {
-                return;
-            }
+        if (signupData.password !== signupData.repeatedPassword) {
 
-            delete signupData.repeatedPassword;
-            await registerNewUser(signupData);
-
-            dispatch(uiActions.setAuthErrorInfo({
-                isActiveError: false,
-                message: 'Registration was successful'
-            }));
-
-        } catch (errorMessage) {
-
-            dispatch(uiActions.setAuthErrorInfo(
-                {
-                    isActiveError: true,
-                    message: errorMessage as string
-                }
-            ));
+            setRegistrationLocalError('Пароли должны совпадать');
+            return
         }
+
+        await dispatch(registration(signupData));
     };
 
     useEffect(() => {
-        dispatch(uiActions.setAuthErrorInfo({
-            isActiveError: false,
-            message: ''
-        }));
-    }, [dispatch])
+
+        if (authStatus === 'fulfilled' && registrationServerError === null) {
+            // понимаю, что мог бы не создавать этот стейт,
+            // но почему-то посчитал, что правильнее будет создать переменную, 
+            // отвечающую за успешную регистрациию, чем писать условие у jsx 
+            setRegistrationIsSuccessful(true);
+            return
+        }
+
+        //Решил разместить здесь, а не в уведомлении, т.к по идее когда
+        //  что-то не так с данными для регистрации, то сообщение отображается рядом с формой
+        if ((registrationServerError) && (registrationServerError !== 'Серверная ошибка' && registrationServerError !== 'Ошибка =/')) {
+            setRegistrationLocalError(registrationServerError);
+        }
+
+    }, [authStatus, registrationServerError])
 
     return <>
 
@@ -73,56 +67,87 @@ const RegistrationPage: React.FC = () => {
 
             <h1>Create your account</h1>
 
-            {(errorInfo.message !== 'Registration was successful') &&
+            {!registrationIsSuccessful &&
                 <Form onFinish={handleSignup}>
                     <label htmlFor="name">Your name *</label>
-                    <FormItem<UserRegistrationData>
-                        name="username">
+                    <Form.Item<UserRegistrationData>
+                        name="username"
+                        rules={[
+                            { required: true, whitespace: true, message: "Введите имя" },
+                            { min: 1, max: 60, pattern: isRusAndEngLettersRegexp, message: "Имя должно содержать от 1 до 60 символов русского или латинского алфавита" }
+                        ]}>
                         <Input id="name" />
-                    </FormItem>
+                    </Form.Item>
 
                     <label htmlFor="login">Login *</label>
-                    <FormItem<UserRegistrationData>
-                        name="login">
+                    <Form.Item<UserRegistrationData>
+                        name="login"
+                        rules={[
+                            { required: true, whitespace: true, message: "Введите логин" },
+                            { min: 2, max: 60, pattern: isEngLettersRegexp, message: "Логин должен содержать от 2 до 60 символов латинского алфавита" }
+                        ]}>
                         <Input id="login" />
-                    </FormItem>
+                    </Form.Item>
 
                     <label htmlFor="pwd">Password *</label>
-                    <FormItem<UserRegistrationData>
-                        name="password">
+                    <Form.Item<UserRegistrationData>
+                        name="password"
+                        rules={[
+                            { required: true, message: "Введите пароль" },
+                            { min: 6, max: 60, message: "Пароль должен содержать от 6 до 60 символов" }
+                        ]}
+                    >
                         <Input type="password" id="pwd" />
-                    </FormItem>
+                    </Form.Item>
 
                     <label htmlFor="repeat-pwd">Repeat password *</label>
-                    <FormItem<UserRegistrationData>
-                        name="repeatedPassword">
+                    <Form.Item<UserRegistrationData>
+                        name="repeatedPassword"
+                        rules={[
+                            { required: true, message: "Введите пароль" },
+                            { min: 6, max: 60, message: "Пароль должен содержать от 6 до 60 символов" }
+                        ]}>
                         <Input type="password" id="repeat-pwd" />
-                    </FormItem>
+                    </Form.Item>
 
 
                     <label htmlFor="email">Email *</label>
-                    <FormItem<UserRegistrationData>
-                        name="email">
-                        <Input type="email" id="email" />
-                    </FormItem>
+                    <Form.Item<UserRegistrationData>
+                        name="email"
+                        rules={[
+                            {
+                                type: 'email',
+                                message: 'Введите корректный адрес электронной почты',
+                            },
+                            {
+                                required: true,
+                                message: 'Введите адрес электронной почты',
+                            },
+                        ]}>
+                        <Input id="email" />
+                    </Form.Item>
 
                     <label htmlFor="tel">Phone number</label>
-                    <FormItem<UserRegistrationData>
-                        name="phoneNumber">
+                    <Form.Item<UserRegistrationData>
+                        name="phoneNumber"
+                        rules={[{
+                            pattern: isValidRusPhoneRegexp, message: 'Введите номер телефона'
+                        }]}
+                    >
                         <Input type="tel" id="tel" />
-                    </FormItem>
+                    </Form.Item>
 
                     <button type="submit">Signup</button>
                 </Form>}
 
 
-            {errorInfo.isActiveError && <div className={classes.errorBlock}>
-                {errorInfo.message}
+            {registrationLocalError && <div className={classes.errorBlock}>
+                {registrationLocalError}
             </div>}
 
-            {(errorInfo.message === 'Registration was successful') &&
+            {registrationIsSuccessful &&
                 <div className={classes.successfulRegistrationBlock}>
-                    <p>{errorInfo.message}</p>
+                    <p>Регистрация прошла успешно</p>
                     <Link to='/authentication'>Login</Link>
                 </div>}
 

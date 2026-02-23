@@ -4,63 +4,31 @@ import NavigationMenu from "../components/NavigationMenu";
 
 import { useEffect } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 
-import { refreshTokens } from '../api/https.ts';
+import { checkAuth } from "../store/user/userActions";
 
-import { getProfile } from "../store/user/userActions.ts";
-import { userActions } from "../store/user/userSlice.ts";
+import { notification, Spin } from 'antd';
 
-import { notification } from 'antd';
 type NotificationType = 'success' | 'info' | 'warning' | 'error';
 
 
 const RootLayout: React.FC = () => {
 
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [api, contextHolder] = notification.useNotification();
 
-    const { status, error } = useAppSelector(state => state.user.asyncData);
-    const isAuthorized = useAppSelector(state => state.user.isAuthorized);
-    const errorInfo = useAppSelector(state => state.ui.errorInfo);
-    const todoFetchingError = useAppSelector(state => state.todos.asyncData.error);
+    const { status, error: userError, isAuthorized } = useAppSelector(state => state.user);
+    const todosError = useAppSelector(state => state.todos.error);
 
-    const authorize = async () => {
-
-        const refreshToken = localStorage.getItem('refreshToken');
-
-        if (!refreshToken) {
-            dispatch(userActions.setIsAuthorized(false));
-            return navigate('/authentication');
-        }
-
-        try {
-            const tokens = await refreshTokens(refreshToken);
-            localStorage.setItem('refreshToken', tokens.refreshToken);
-
-            await dispatch(getProfile(tokens.accessToken));
-
-            if (status === 'rejected') {
-                return navigate('/authentication');
-
-            }
-
-            dispatch(userActions.setIsAuthorized(true));
-        }
-        catch (error) {
-            dispatch(userActions.setIsAuthorized(false));
-            return navigate('/authentication');
-        }
-    }
 
     const openNotificationWithIcon = (type: NotificationType) => {
 
         api[type]({
             title: 'Ошибка!',
-            description: error?.message || errorInfo.message || todoFetchingError?.message
+            description: userError.message || todosError.message
         });
     };
 
@@ -68,21 +36,25 @@ const RootLayout: React.FC = () => {
 
         (async () => {
             if (status === 'idle') {
-                await authorize();
+                await dispatch(checkAuth());
             }
         })();
     }, [dispatch, status]);
 
     useEffect(() => {
-        if (errorInfo.isActiveError || error?.isActiveError || todoFetchingError?.isActiveError) {
+        if (userError.message || todosError.message) {
             openNotificationWithIcon('error');
         }
-    }, [errorInfo, error, todoFetchingError]);
+    }, [userError.count, todosError.count]);
 
 
 
     if (status === 'idle' || status === 'pending') {
-        return 'Загрузка...'
+        return <Spin />
+    }
+
+    if (!isAuthorized) {
+        return <Navigate to='/authentication' />
     }
 
     if (isAuthorized) {

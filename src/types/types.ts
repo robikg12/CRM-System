@@ -62,4 +62,6 @@ export interface Tokens {
 
 export type Role = 'ADMIN' | 'USER' | 'MODERATOR';
 
+export type AsyncStatus = 'idle' | 'pending' | 'fulfilled' | 'rejected';
+
 

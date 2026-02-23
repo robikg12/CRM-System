@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { editItem, deleteItem } from '../../api/https';
 
 import type { Todo, TodoRequest } from '../../types/types';
 
@@ -10,11 +9,13 @@ import type { CheckboxProps, FormProps } from 'antd';
 import { StopOutlined, FormOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
 
 import { useAppDispatch } from '../../store/hooks';
-import { uiActions } from '../../store/ui/uiSlice.ts';
 
-import { refreshTodosData } from '../../store/todos/todosActions.ts';
+import { MIN_TODO_TITLE_LENGTH, MAX_TODO_TITLE_LENGTH } from '../../validation.ts';
 
-import { MIN_TODO_TITLE_LENGHT, MAX_TODO_TITLE_LENGHT } from '../../validation.ts';
+import { editTodo, deleteTodo } from '../../store/todos/todosActions.ts';
+
+import { Spin } from 'antd';
+
 
 type FieldType = {
     title: string;
@@ -32,81 +33,58 @@ const TodoItem: React.FC<{
 
     const [form] = Form.useForm();
 
-    const handleEditStatus: CheckboxProps['onChange'] = async (e) => {
-        try {
-            setIsLoading(true);
-            const newStatus = e.target.checked;
-            const todoRequest: TodoRequest = { isDone: newStatus, title: todo.title };
-            await editItem(todo.id, todoRequest);
-            await dispatch(refreshTodosData());
-            setIsLoading(false);
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                dispatch(uiActions.setErrorInfo({
-                    isActiveError: true,
-                    message: error.message
-                }));
-            }
-        }
-    };
-
-    function handleChangeTitleText(event: React.ChangeEvent<HTMLInputElement>) {
+    const handleChangeTitleText = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEditedTitle(event.target.value);
     }
 
-    async function handleEditing() {
+    const handleEditing = () => {
         setIsEditing(true);
     }
 
-
-    const handleSaveTodo: FormProps<FieldType>['onFinish'] = async () => {
-        try {
-            setIsLoading(true);
-            const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
-            await editItem(todo.id, todoRequest);
-            await dispatch(refreshTodosData());
-            setIsLoading(false);
-            setIsEditing(false);
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                dispatch(uiActions.setErrorInfo({
-                    isActiveError: true,
-                    message: error.message
-                }));
-            }
-        }
-    };
-
-    function handleCancelEditing() {
+    const handleCancelEditing = () => {
         setEditedTitle(todo.title);
         form.setFieldValue('title', todo.title); //Пришлось добавить эту строчку, чтобы исправить ошибку.
         setIsEditing(false);
-
     }
 
-    async function handleDelete() {
+    const handleEditStatus: CheckboxProps['onChange'] = async (e) => {
+        setIsLoading(true);
+        const newStatus = e.target.checked;
+        const todoRequest: TodoRequest = { isDone: newStatus, title: todo.title };
 
-        try {
-            setIsLoading(true);
-            await deleteItem(todo.id);
-            await dispatch(refreshTodosData());
-            setIsLoading(false);
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                dispatch(uiActions.setErrorInfo({
-                    isActiveError: true,
-                    message: error.message
-                }));
-            }
-        }
+
+        await dispatch(editTodo({
+            id: todo.id,
+            request: todoRequest
+        }));
+
+        setIsLoading(false);
+    };
+
+    const handleSaveTodo: FormProps<FieldType>['onFinish'] = async () => {
+
+        setIsLoading(true);
+        setIsEditing(false);
+        const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle };
+
+        await dispatch(editTodo({ id: todo.id, request: todoRequest }));
+
+        setIsLoading(false);
+
+    };
+
+    const handleDelete = async () => {
+
+        setIsLoading(true);
+        await dispatch(deleteTodo(todo.id));
+        setIsLoading(false);
     }
+
+
 
     let titleElement = <p className={`${classes.itemInputText} ${todo.isDone ? classes.isDone : ''}`}>{todo.title}</p>;
     if (isLoading) {
-        titleElement = <p className={`${classes.itemInputText} ${classes.blue}`}>Загрузочка...</p>
+        titleElement = <div className={classes.spinWrapper}><Spin /></div>
     }
     return (
         <Card style={{ width: '100%' }}>
@@ -117,15 +95,15 @@ const TodoItem: React.FC<{
 
                 <Flex align='center' >
 
-                    <Checkbox defaultChecked={todo.isDone} onChange={handleEditStatus} />
+                    <Checkbox checked={todo.isDone} onChange={handleEditStatus} />
 
 
                     {isEditing ? <>
                         <Form.Item
-                            style={{ flexGrow: 1, marginTop: "20px" }} //как я понял обёртки Form.item сбивают flex align center для этих элементов, самый простой способ который придумал - добавить margin
+                            style={{ flexGrow: 1, marginBottom: '0px' }} //как я понял обёртки Form.item сбивают flex align center для этих элементов, самый простой способ который придумал - добавить margin
                             rules={[{ required: true, message: 'Введите задачу' },
                             { whitespace: true, message: "Задача не может быть пустой" },
-                            { min: MIN_TODO_TITLE_LENGHT, max: MAX_TODO_TITLE_LENGHT, message: 'Задача должна содержать от 2 до 64 символов' }]}
+                            { min: MIN_TODO_TITLE_LENGTH, max: MAX_TODO_TITLE_LENGTH, message: 'Задача должна содержать от 2 до 64 символов' }]}
                             name='title'>
 
                             <Input
@@ -134,7 +112,7 @@ const TodoItem: React.FC<{
                                 onChange={handleChangeTitleText} />
                         </Form.Item>
                         <Form.Item >
-                            <Button type='primary' size='large' htmlType='submit' style={{ marginTop: "22px" }}>
+                            <Button type='primary' size='large' htmlType='submit' style={{ marginBottom: '0px' }}>
                                 <SaveOutlined style={{ fontSize: '24px', color: 'white' }} />
                             </Button>
                         </Form.Item>
@@ -143,10 +121,10 @@ const TodoItem: React.FC<{
                         </Button>
                     </> : <>
                         {titleElement}
-                        <Button type='primary' size='large' onClick={handleEditing}>
+                        <Button type='primary' size='large' onClick={handleEditing} disabled={isLoading}>
                             <FormOutlined style={{ fontSize: '24px', color: 'white' }} />
                         </Button>
-                        <Button color='danger' variant='solid' size='large' onClick={handleDelete}>
+                        <Button color='danger' variant='solid' size='large' onClick={handleDelete} disabled={isLoading}>
                             <DeleteOutlined style={{ fontSize: '24px', color: 'white' }} />
                         </Button>
                     </>}

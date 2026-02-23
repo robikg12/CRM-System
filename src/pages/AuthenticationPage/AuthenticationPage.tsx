@@ -3,68 +3,47 @@ import classes from './AuthenticationPage.module.css';
 import AuthDesignIcon from '../../assets/img/icons/AuthenticationDesignIcon.svg?react';
 import OverflowCircle from '../../assets/img/design/Authentication/overflowCircle.svg?react';
 
-import { useNavigate, Link } from 'react-router';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
+
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+
+import { login } from '../../store/user/userActions';
+
+import { Navigate, Link } from 'react-router';
 
 import type { AuthData } from '../../types/types';
 
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { uiActions } from '../../store/ui/uiSlice';
-import { userActions } from '../../store/user/userSlice';
-
-import { authDataValidation } from '../../validation';
-
-import { userAuthentication } from '../../api/https';
 
 import type { FormProps } from 'antd';
 import { Form, Input } from 'antd';
-import FormItem from 'antd/es/form/FormItem';
+
+import { isEngLettersRegexp } from '../../validation';
 
 
 const AuthenticationPage: React.FC = () => {
 
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    const errorInfo = useAppSelector(state => state.ui.authErrorInfo);
+    const serverError = useAppSelector(state => state.user.error);
+    const { isAuthorized, authStatus } = useAppSelector(state => state.user);
+
+    const [localError, setLocalError] = useState<string>('');
 
     const handleLogin: FormProps<AuthData>['onFinish'] = async (loginInputData) => {
-        try {
-            dispatch(userActions.setIdleStatus()); //Костыль, чтобы если сделаю логаут, то статус встал обратно в idle.
 
-            const errorInformation = authDataValidation(loginInputData);
-            dispatch(uiActions.setAuthErrorInfo(errorInformation));
-            if (errorInformation.isActiveError) {
-                return;
-            }
-
-            const tokens = await userAuthentication(loginInputData);
-            localStorage.setItem('refreshToken', tokens.refreshToken);
-
-            dispatch(uiActions.setAuthErrorInfo({
-                isActiveError: false,
-                message: 'Успешная авторизация'
-            }));
-            navigate('/');
-
-        }
-        catch (errorMessage) {
-            dispatch(uiActions.setAuthErrorInfo({
-                isActiveError: true,
-                message: errorMessage as string
-            }));
-        }
+        await dispatch(login(loginInputData));
     };
 
-
-
     useEffect(() => {
-        dispatch(uiActions.setAuthErrorInfo({
-            isActiveError: false,
-            message: ''
-        }));
-    }, [dispatch])
 
+        if ((serverError.message) && (serverError.message !== 'Серверная ошибка' && serverError.message !== 'Ошибка =/')) {
+            setLocalError(serverError.message);
+        }
+    }, [serverError.count, serverError])
+
+    if (authStatus === 'fulfilled' && isAuthorized) {
+        return <Navigate to='/' />;
+    }
 
     return <div className={classes.formWrapper}>
         <AuthDesignIcon className={classes.authDesignIcon} />
@@ -74,16 +53,24 @@ const AuthenticationPage: React.FC = () => {
         <p>See what is going on with your business</p>
         <Form onFinish={handleLogin}>
             <label htmlFor="login">Login</label>
-            <FormItem<AuthData>
-                name="login">
+            <Form.Item<AuthData>
+                name="login"
+                rules={[
+                    { required: true, whitespace: true, message: "Введите ваш логин" },
+                    { min: 2, max: 60, pattern: isEngLettersRegexp, message: "Неверный логин или пароль" }
+                ]}>
                 <Input />
-            </FormItem>
+            </Form.Item>
 
             <label htmlFor="password">Password</label>
-            <FormItem<AuthData>
-                name="password">
-                <Input type='password' />
-            </FormItem>
+            <Form.Item<AuthData>
+                name="password"
+                rules={[
+                    { required: true, message: "Введите пароль" },
+                    { min: 6, max: 60, message: "Неверный логин или пароль" }
+                ]}>
+                <Input.Password size="large" />
+            </Form.Item>
 
             <div className={classes.wrapperOfCheckboxAndLink}>
                 <input type="checkbox" id="checkbox" />
@@ -94,8 +81,8 @@ const AuthenticationPage: React.FC = () => {
         </Form>
 
         {
-            errorInfo.isActiveError && <div className={classes.errorBlock}>
-                {errorInfo.message}
+            localError && <div className={classes.errorBlock}>
+                {localError}
             </div>
         }
 

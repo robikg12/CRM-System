@@ -1,59 +1,58 @@
 import classes from './ProfilePage.module.css';
 
-import { useNavigate } from 'react-router';
-
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
-import { userLogout, refreshTokens } from '../../api/https';
+import { logout } from '../../store/user/userActions';
 
-import { userActions } from '../../store/user/userSlice';
-import { uiActions } from '../../store/ui/uiSlice';
+import { Typography } from 'antd';
+
+import { Descriptions } from 'antd';
+import type { DescriptionsProps } from 'antd';
+
+
+
+
+const { Title } = Typography;
 
 const ProfilePage: React.FC = () => {
 
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    const profileData = useAppSelector((state) => state.user.asyncData.data);
+    const profileData = useAppSelector((state) => state.user.profile);
 
     const handleLogout = async () => {
-
-        const refreshToken = localStorage.getItem('refreshToken');
-
-        if (!refreshToken) { //на всякий случай
-            dispatch(userActions.setIsAuthorized(false));
-            localStorage.removeItem('refreshToken');
-            return navigate('/authentication');
-        }
-
-        try {
-            const tokens = await refreshTokens(refreshToken);
-            await userLogout(tokens.accessToken);
-            localStorage.removeItem('refreshToken');
-            dispatch(userActions.setIsAuthorized(false));
-            return navigate('/authentication');
-        }
-        catch (error) {
-
-            dispatch(uiActions.setErrorInfo({
-                isActiveError: true,
-                message: error as string
-            }));
-            localStorage.removeItem('refreshToken');
-            dispatch(userActions.setIsAuthorized(false));
-            return navigate('/authentication');
-        }
+        await dispatch(logout());
     }
 
-    return <><h1 style={{ marginLeft: '500px' }} >
-        привет
-    </ h1>
-        {profileData && <div>
-            <p>Твоё имя: {profileData.username}</p>
-            <p>Твоя почта: {profileData.email}</p>
-            <p>Твой номер телефона: {profileData.phoneNumber}</p>
-        </div>}
+
+
+    const items: DescriptionsProps['items'] = [
+        {
+            key: '1',
+            label: 'Ваше имя',
+            children: profileData.username,
+        },
+        {
+            key: '2',
+            label: 'Ваша почта',
+            children: profileData.email,
+        },
+        {
+            key: '3',
+            label: 'Ваш номер телефона',
+            children: profileData.phoneNumber,
+        }
+    ];
+
+
+    return <>
+        <Title>
+            привет
+        </ Title>
+        {profileData && <div style={{ width: '30%', padding: '0px 40px 0px 40px' }}><Descriptions title="Данные" items={items} layout='vertical' /></div>}
         <button onClick={handleLogout} className={classes.logoutButton}>Logout</button>
     </>
+
+
 }
 export default ProfilePage;

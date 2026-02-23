@@ -1,23 +1,23 @@
-import { createNewItem } from '../../api/https'
-import type { TodoRequest } from '../../types/types';
-
 import React from 'react';
+
+import classes from './AddTodo.module.css';
 
 import { Button, Form, Input, Flex } from 'antd';
 
+import { useAppDispatch } from '../../store/hooks';
+
+import { createTodo } from '../../store/todos/todosActions.ts';
+
+import { MIN_TODO_TITLE_LENGTH, MAX_TODO_TITLE_LENGTH } from '../../validation.ts';
+
+import type { TodoRequest } from '../../types/types';
+
 import type { FormProps } from 'antd';
 
-import { useAppDispatch } from '../../store/hooks';
-import { uiActions } from '../../store/ui/uiSlice.ts';
-
-import { refreshTodosData } from '../../store/todos/todosActions.ts';
-
-import { MIN_TODO_TITLE_LENGHT, MAX_TODO_TITLE_LENGHT } from '../../validation.ts';
 
 type FieldType = {
     title: string;
 }
-
 
 const AddTodo: React.FC = () => {
 
@@ -27,20 +27,9 @@ const AddTodo: React.FC = () => {
     const [form] = Form.useForm();  //К этой строчке дошёл не самостоятельно.
 
     const handleAddTodo: FormProps<FieldType>['onFinish'] = async (values) => {
-        const todoRequest: TodoRequest = { isDone: false, title: values.title }
-        try {
-            await createNewItem(todoRequest);
-            await dispatch(refreshTodosData());
-            form.resetFields();
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                dispatch(uiActions.setErrorInfo({
-                    isActiveError: true,
-                    message: error.message
-                }));
-            }
-        }
+        const todoRequest: TodoRequest = { isDone: false, title: values.title };
+        await dispatch(createTodo(todoRequest));
+        form.resetFields();
     }
 
     return (
@@ -53,11 +42,12 @@ const AddTodo: React.FC = () => {
                     rules={[{ required: true, message: 'Введите задачу' },
                     { whitespace: true, message: "Задача не может быть пустой" },
                     {
-                        min: MIN_TODO_TITLE_LENGHT,
-                        max: MAX_TODO_TITLE_LENGHT,
+                        min: MIN_TODO_TITLE_LENGTH,
+                        max: MAX_TODO_TITLE_LENGTH,
                         message: 'Задача должна содержать от 2 до 64 символов'
-                    }]}>
-                    <Input placeholder='Нужно сделать...' size='large' style={{ width: '415px' }} />
+                    }]}
+                    className={classes.inputWrapper}>
+                    <Input placeholder='Нужно сделать...' size='large' className={classes.input} />
                 </Form.Item>
                 <Form.Item >
                     <Button type="primary" htmlType="submit">Добавить</Button>

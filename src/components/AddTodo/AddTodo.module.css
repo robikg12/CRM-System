@@ -5,15 +5,15 @@
 
 }
 
-.input {
-    flex: 1 1 314px;
-    outline: none;
-    border-top: unset;
-    border-left: unset;
-    border-right: unset;
-    border-bottom: 1px solid #697389;
-    color: #444444;
+.inputWrapper {
+    display: flex !important;
+    flex-grow: 1;
 }
+
+.inputWrapper div {
+    width: 100%;
+}
+
 
 .button {
     color: #ffffff;

@@ -8,35 +8,36 @@ import type { TabsProps } from 'antd';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
 import { todosActions } from '../../store/todos/todosSlice.ts';
 
+import { selectTodoInfo } from '../../store/todos/todosSlice.ts';
+
 const TodoFilter: React.FC = () => {
 
-    const counts = useAppSelector((state) => state.todos.asyncData.data?.info);
+    const counts = useAppSelector(selectTodoInfo);
+    const currentCategory = useAppSelector((state) => state.todos.currentCategory);
 
     const dispatch = useAppDispatch();
 
-    function onChange(key: Category): void;
-    function onChange(key: string): void;
-    function onChange(key: string): void {
+    const onChange = (key: string) => {
         dispatch(todosActions.setCurrentCategory(key as Category));
-    };
+    }
 
     const items: TabsProps['items'] = [
         {
             key: 'all',
-            label: `Все (${counts && counts.all})`,
+            label: `Все (${counts && counts.all || 0})`,
         },
         {
             key: 'inWork',
-            label: `В работе ${counts && counts.inWork}`,
+            label: `В работе ${counts && counts.inWork || 0}`,
         },
         {
             key: 'completed',
-            label: `сделано ${counts && counts.completed}`,
+            label: `Сделано ${counts && counts.completed || 0}`,
         },
     ];
 
     return (
-        <Tabs items={items} onChange={onChange} />
+        <Tabs items={items} onChange={onChange} activeKey={currentCategory} />
     );
 }
 
