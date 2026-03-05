@@ -31,4 +31,37 @@ export interface ErrorInfo {
     message: string;
 }
 
+export interface UserRegistrationData {
+    login: string;
+    username: string;
+    password: string;
+    repeatedPassword?: string;
+    email: string;
+    phoneNumber: string;
+}
+
+export interface AuthData {
+    login: string;
+    password: string;
+}
+
+export interface Profile {
+    id: number;
+    username: string;
+    email: string;
+    date: string;
+    isBlocked: boolean;
+    roles: Role[];
+    phoneNumber: string;
+}
+
+export interface Tokens {
+    accessToken: string
+    refreshToken: string
+}
+
+export type Role = 'ADMIN' | 'USER' | 'MODERATOR';
+
+export type AsyncStatus = 'idle' | 'pending' | 'fulfilled' | 'rejected';
+
 

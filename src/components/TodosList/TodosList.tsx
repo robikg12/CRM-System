@@ -2,11 +2,10 @@ import React from 'react';
 
 import TodoItem from '../TodoItem/TodoItem';
 
-import classes from './TodosList.module.css';
+import { List, Spin } from 'antd';
 
-import type { Todo, TodoInfo, MetaResponse, ErrorInfo } from '../../types/types';
+import type { MetaResponse, Todo, TodoInfo, ErrorInfo } from '../../types/types';
 
-import { List } from 'antd';
 
 const TodosList: React.FC<{
     todosData: MetaResponse<Todo, TodoInfo>;
@@ -15,14 +14,16 @@ const TodosList: React.FC<{
     setErrorInfo: (error: ErrorInfo) => void;
 
 }> = ({ todosData, refreshData, isLoading, setErrorInfo }) => {
-    
+
+
+
     return (
         <>
-            {isLoading && <p className={classes.loadingText}>Загрузочка...</p>}
+            {isLoading && <Spin />}
             {(!isLoading) && <List
                 size="large"
-                dataSource={todosData.data}
-                renderItem={(todo) => <List.Item style={{ padding: '5px 0px 5px 0px' }}>
+                dataSource={todosData?.data}
+                renderItem={(todo) => <List.Item >
                     <TodoItem
                         key={todo.id}
                         todo={todo}
