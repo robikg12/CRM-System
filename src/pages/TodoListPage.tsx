@@ -5,12 +5,17 @@ import TodosList from '../components/TodosList/TodosList'
 import type { Todo, TodoInfo, MetaResponse, Category, ErrorInfo } from '../types/types';
 
 import { useState, useEffect, useCallback } from "react";
-import { fetchTodosData } from "../api/https";
+import { useOutletContext } from "react-router-dom";
 
-import { Alert } from 'antd';
+
+
+import { fetchTodos } from "../api/https";
+
+
 
 const TodoListPage: React.FC = () => {
 
+    const { handleSetErrorInfo: setErrorInfo } = useOutletContext<{ handleSetErrorInfo: (ErrorInfo: ErrorInfo) => void }>();
     const [todosData, setTodosData] = useState<MetaResponse<Todo, TodoInfo>>({
         data: [],
         info: {
@@ -24,32 +29,21 @@ const TodoListPage: React.FC = () => {
     });
     const [currentCategory, setCurrentCategory] = useState<Category>('all');
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [errorInfo, setErrorInfo] = useState<ErrorInfo>({ isActiveError: false, message: '' });
 
     const handleSelectCategory = useCallback((category: Category) => {
         setCurrentCategory(category);
     }, []);
 
-    const handleSetErrorInfo = useCallback((error: ErrorInfo) => {
-        setErrorInfo(error);
-    }, [])
-
-    const onClose: React.MouseEventHandler<HTMLButtonElement> = () => {
-        handleSetErrorInfo({
-            isActiveError: false,
-            message: ''
-        })
-    };
 
 
     const refreshData = useCallback(async () => {
         try {
-            const responseData = await fetchTodosData(currentCategory);
+            const responseData = await fetchTodos(currentCategory);
             setTodosData(responseData);
         }
         catch (error) {
             if (error instanceof Error) { // К такому вот подходу дошёл не сам, а загуглил.
-                handleSetErrorInfo({
+                setErrorInfo({
                     isActiveError: true,
                     message: error.message
                 });
@@ -65,37 +59,31 @@ const TodoListPage: React.FC = () => {
         setIsLoading(false);
 
         const intervalId = setInterval(refreshData, 5000);
-        return () => clearInterval(intervalId); //Про вот эту вот штуку - загуглил.
+        return () => clearInterval(intervalId);
     }, [currentCategory]);
 
 
     return (
         <div className="wrapper">
-            {errorInfo.isActiveError &&
-                <Alert
-                    title={errorInfo.message}
-                    type="error"
-                    closable={{ closeIcon: true, onClose, 'aria-label': 'close' }} />}
 
             <AddTodo
                 refreshData={refreshData}
-                setErrorInfo={handleSetErrorInfo} />
+                setErrorInfo={setErrorInfo} />
 
             <div className="wrapperOfAllList">
 
-                {todosData.info && <TodoFilter
+                {todosData?.info && <TodoFilter
                     counts={todosData.info}
                     handleSelectCategory={handleSelectCategory}
-                />
-                }
-                {todosData.info &&
-                    <TodosList
-                        todosData={todosData}
-                        refreshData={refreshData}
-                        isLoading={isLoading}
-                        setErrorInfo={handleSetErrorInfo}
-                    />
-                }
+                    currentCategory={currentCategory}
+                />}
+
+                {todosData?.info && <TodosList
+                    todosData={todosData}
+                    refreshData={refreshData}
+                    isLoading={isLoading}
+                    setErrorInfo={setErrorInfo}
+                />}
             </div>
         </div>
     )

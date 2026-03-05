@@ -4,7 +4,10 @@ import RootLayout from './pages/RootLayout';
 
 import ErrorPage from './pages/ErrorPage';
 import TodoListPage from "./pages/TodoListPage";
-import ProfilePage from './pages/ProfilePage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
+import AuthLayout from './pages/AuthLayout/AuthLayout'
+import AuthenticationPage from "./pages/AuthenticationPage/AuthenticationPage";
+import RegistrationPage from "./pages/RegistrationPage/RegistrationPage";
 
 function App() {
 
@@ -23,6 +26,19 @@ function App() {
           element: <ProfilePage />
         }
       ],
+    },
+    {
+      element: < AuthLayout />,
+      children: [
+        {
+          path: '/authentication',
+          element: <AuthenticationPage />
+        },
+        {
+          path: '/signup',
+          element: <RegistrationPage />
+        }
+      ]
     }
   ]);
 

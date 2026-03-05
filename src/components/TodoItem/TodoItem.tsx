@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { editItem, deleteItem } from '../../api/https';
 
 import type { Todo, TodoRequest, ErrorInfo } from '../../types/types';
 
@@ -8,6 +7,14 @@ import classes from './TodoItem.module.css';
 import { Card, Flex, Checkbox, Button, Input, Form } from 'antd';
 import type { CheckboxProps, FormProps } from 'antd';
 import { StopOutlined, FormOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
+
+import { MIN_TODO_TITLE_LENGTH, MAX_TODO_TITLE_LENGTH } from '../../validation.ts';
+
+
+import { Spin } from 'antd';
+
+import { editItem, deleteItem } from '../../api/https.ts';
+
 
 type FieldType = {
     title: string;
@@ -28,6 +35,20 @@ const TodoItem: React.FC<{
 
     const [form] = Form.useForm();
 
+    const handleChangeTitleText = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEditedTitle(event.target.value);
+    }
+
+    const handleEditing = () => {
+        setIsEditing(true);
+    }
+
+    const handleCancelEditing = () => {
+        setEditedTitle(todo.title);
+        form.setFieldValue('title', todo.title); //Пришлось добавить эту строчку, чтобы исправить ошибку.
+        setIsEditing(false);
+    }
+
     const handleEditStatus: CheckboxProps['onChange'] = async (e) => {
         try {
             setIsLoading(true);
@@ -46,15 +67,6 @@ const TodoItem: React.FC<{
             }
         }
     };
-
-    function handleChangeTitleText(event: React.ChangeEvent<HTMLInputElement>) {
-        setEditedTitle(event.target.value);
-    }
-
-    async function handleEditing() {
-        setIsEditing(true);
-    }
-
 
     const handleSaveTodo: FormProps<FieldType>['onFinish'] = async () => {
         try {
@@ -75,14 +87,7 @@ const TodoItem: React.FC<{
         }
     };
 
-    function handleCancelEditing() {
-        setEditedTitle(todo.title);
-        form.setFieldValue('title', todo.title); //Пришлось добавить эту строчку, чтобы исправить ошибку.
-        setIsEditing(false);
-
-    }
-
-    async function handleDelete() {
+    const handleDelete = async () => {
 
         try {
             setIsLoading(true);
@@ -100,9 +105,11 @@ const TodoItem: React.FC<{
         }
     }
 
+
+
     let titleElement = <p className={`${classes.itemInputText} ${todo.isDone ? classes.isDone : ''}`}>{todo.title}</p>;
     if (isLoading) {
-        titleElement = <p className={`${classes.itemInputText} ${classes.blue}`}>Загрузочка...</p>
+        titleElement = <div className={classes.spinWrapper}><Spin /></div>
     }
     return (
         <Card style={{ width: '100%' }}>
@@ -113,15 +120,15 @@ const TodoItem: React.FC<{
 
                 <Flex align='center' >
 
-                    <Checkbox defaultChecked={todo.isDone} onChange={handleEditStatus} />
+                    <Checkbox checked={todo.isDone} onChange={handleEditStatus} />
 
 
                     {isEditing ? <>
                         <Form.Item
-                            style={{ flexGrow: 1, marginTop: "20px" }} //как я понял обёртки Form.item сбивают flex align center для этих элементов, самый простой способ который придумал - добавить margin
+                            style={{ flexGrow: 1, marginBottom: '0px' }} //как я понял обёртки Form.item сбивают flex align center для этих элементов, самый простой способ который придумал - добавить margin
                             rules={[{ required: true, message: 'Введите задачу' },
                             { whitespace: true, message: "Задача не может быть пустой" },
-                            { min: 2, max: 64, message: 'Задача должна содержать от 2 до 64 символов' }]}
+                            { min: MIN_TODO_TITLE_LENGTH, max: MAX_TODO_TITLE_LENGTH, message: 'Задача должна содержать от 2 до 64 символов' }]}
                             name='title'>
 
                             <Input
@@ -130,7 +137,7 @@ const TodoItem: React.FC<{
                                 onChange={handleChangeTitleText} />
                         </Form.Item>
                         <Form.Item >
-                            <Button type='primary' size='large' htmlType='submit' style={{ marginTop: "22px" }}>
+                            <Button type='primary' size='large' htmlType='submit' style={{ marginBottom: '0px' }}>
                                 <SaveOutlined style={{ fontSize: '24px', color: 'white' }} />
                             </Button>
                         </Form.Item>
@@ -139,10 +146,10 @@ const TodoItem: React.FC<{
                         </Button>
                     </> : <>
                         {titleElement}
-                        <Button type='primary' size='large' onClick={handleEditing}>
+                        <Button type='primary' size='large' onClick={handleEditing} disabled={isLoading}>
                             <FormOutlined style={{ fontSize: '24px', color: 'white' }} />
                         </Button>
-                        <Button color='danger' variant='solid' size='large' onClick={handleDelete}>
+                        <Button color='danger' variant='solid' size='large' onClick={handleDelete} disabled={isLoading}>
                             <DeleteOutlined style={{ fontSize: '24px', color: 'white' }} />
                         </Button>
                     </>}

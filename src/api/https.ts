@@ -1,63 +1,101 @@
-import type { MetaResponse, Todo, Category, TodoInfo, TodoRequest } from '../types/types';
-
 import axios from 'axios';
 
+import type {
+    MetaResponse, Todo, Category, TodoInfo,
+    TodoRequest, UserRegistrationData,
+    Profile, AuthData, Tokens
+} from '../types/types';
 
-const apiClient = axios.create({
-    baseURL: 'https://easydev.club/api/v1'
+import { accessToken } from '../store/user/userActions';
+
+export const apiClient = axios.create({
+    baseURL: 'https://easydev.club/api/v1',
+    headers: {
+        'Content-Type': 'application/json',
+    }
 });
 
-export async function fetchTodosData(category: Category): Promise<MetaResponse<Todo, TodoInfo>> {
 
-    try {
-        const response = await apiClient.get('/todos', {
-            params: {
-                filter: category
+
+//Код не мой, тестирую
+apiClient.interceptors.request.use(
+    async (config) => {
+
+        if (config.headers) {
+            if (accessToken) {
+
+                config.headers.Authorization = `Bearer ${accessToken}`;
             }
-        });
-        return response.data;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    catch (error) {
-        throw new Error(`Не удалось получить записи списка задач по категории`);
-    }
+);
+
+
+
+
+
+
+export async function fetchTodos(category: Category): Promise<MetaResponse<Todo, TodoInfo>> {
+
+    const response = await apiClient.get('/todos', {
+        params: {
+            filter: category
+        }
+    });
+    return response.data;
 }
 
 
-// TODO изучить что такое .then
 export async function createNewItem(todoRequest: TodoRequest): Promise<Todo> {
 
-    try {
-        const response = await apiClient.post('/todos', todoRequest);
-        return response.data;
-    }
-    catch (error) {
-        throw new Error(`Не удалось создать новую задачу `);
-    }
+    const response = await apiClient.post('/todos', todoRequest);
+    return response.data;
 }
 
 
 export async function editItem(id: number, todoRequest: TodoRequest): Promise<Todo> {
 
-    try {
-        // По идее это не квери параметр, так что оставил url в строке
-        const response = await apiClient.put(`/todos/${id}`, todoRequest);
-        return response.data;
-    }
-    catch (error) {
-        throw new Error(`Не удалось отредактировать запись `);
-    }
+    const response = await apiClient.put(`/todos/${id}`, todoRequest);
+    return response.data;
 }
 
 
 export async function deleteItem(id: number): Promise<void> {
 
-    try {
-        // По идее это не квери параметр, так что оставил url в строке
-        await apiClient.delete(`/todos/${id}`);
-
-    }
-    catch (error) {
-        throw new Error(`Не удалось удалить запись `);
-    }
+    await apiClient.delete(`/todos/${id}`);
 }
+
+export async function registerNewUser(registrationData: UserRegistrationData): Promise<Profile> {
+    const response = await apiClient.post('/auth/signup', registrationData);
+    return response.data;
+}
+
+export async function userAuthentication(authData: AuthData): Promise<Tokens> {
+    const response = await apiClient.post('/auth/signin', authData);
+    return response.data;
+}
+
+export async function fetchUserProfile(): Promise<Profile> {
+
+    const response = await apiClient.get('/user/profile');
+    return response.data;
+}
+
+
+export async function refreshTokens(refreshToken: string): Promise<Tokens> {
+    const response = await apiClient.post('/auth/refresh', { refreshToken: refreshToken });
+    return response.data;
+}
+
+export async function userLogout() {
+    await apiClient.post('/user/logout');
+}
+
+
+
+
 
