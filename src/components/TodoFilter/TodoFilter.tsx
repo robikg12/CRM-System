@@ -1,24 +1,22 @@
-import type { Category } from '../../types/types';
-
 import React from 'react';
 
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 
-import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
-import { todosActions } from '../../store/todos/todosSlice.ts';
+import type { TodoInfo, Category } from '../../types/types';
 
-import { selectTodoInfo } from '../../store/todos/todosSlice.ts';
 
-const TodoFilter: React.FC = () => {
+const TodoFilter: React.FC<{
 
-    const counts = useAppSelector(selectTodoInfo);
-    const currentCategory = useAppSelector((state) => state.todos.currentCategory);
+    counts: TodoInfo;
+    handleSelectCategory: (category: Category) => void;
+    currentCategory: Category;
+}> = ({ counts, handleSelectCategory, currentCategory }) => {
 
-    const dispatch = useAppDispatch();
+
 
     const onChange = (key: string) => {
-        dispatch(todosActions.setCurrentCategory(key as Category));
+        handleSelectCategory(key as Category);
     }
 
     const items: TabsProps['items'] = [

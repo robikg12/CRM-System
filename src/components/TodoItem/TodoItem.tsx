@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import type { Todo, TodoRequest } from '../../types/types';
+import type { Todo, TodoRequest, ErrorInfo } from '../../types/types';
 
 import classes from './TodoItem.module.css';
 
@@ -8,13 +8,12 @@ import { Card, Flex, Checkbox, Button, Input, Form } from 'antd';
 import type { CheckboxProps, FormProps } from 'antd';
 import { StopOutlined, FormOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons';
 
-import { useAppDispatch } from '../../store/hooks';
-
 import { MIN_TODO_TITLE_LENGTH, MAX_TODO_TITLE_LENGTH } from '../../validation.ts';
 
-import { editTodo, deleteTodo } from '../../store/todos/todosActions.ts';
 
 import { Spin } from 'antd';
+
+import { editItem, deleteItem } from '../../api/https.ts';
 
 
 type FieldType = {
@@ -23,9 +22,12 @@ type FieldType = {
 
 const TodoItem: React.FC<{
     todo: Todo;
-}> = ({ todo }) => {
+    refreshData: () => Promise<void>;
+    setErrorInfo: (error: ErrorInfo) => void;
 
-    const dispatch = useAppDispatch();
+}> = ({ todo, refreshData, setErrorInfo }) => {
+
+
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [editedTitle, setEditedTitle] = useState<string>(todo.title);
@@ -48,36 +50,59 @@ const TodoItem: React.FC<{
     }
 
     const handleEditStatus: CheckboxProps['onChange'] = async (e) => {
-        setIsLoading(true);
-        const newStatus = e.target.checked;
-        const todoRequest: TodoRequest = { isDone: newStatus, title: todo.title };
-
-
-        await dispatch(editTodo({
-            id: todo.id,
-            request: todoRequest
-        }));
-
-        setIsLoading(false);
+        try {
+            setIsLoading(true);
+            const newStatus = e.target.checked;
+            const todoRequest: TodoRequest = { isDone: newStatus, title: todo.title };
+            await editItem(todo.id, todoRequest);
+            await refreshData();
+            setIsLoading(false);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
+        }
     };
 
     const handleSaveTodo: FormProps<FieldType>['onFinish'] = async () => {
-
-        setIsLoading(true);
-        setIsEditing(false);
-        const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle };
-
-        await dispatch(editTodo({ id: todo.id, request: todoRequest }));
-
-        setIsLoading(false);
-
+        try {
+            setIsLoading(true);
+            const todoRequest: TodoRequest = { isDone: todo.isDone, title: editedTitle }
+            await editItem(todo.id, todoRequest);
+            await refreshData();
+            setIsLoading(false);
+            setIsEditing(false);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
+        }
     };
 
     const handleDelete = async () => {
 
-        setIsLoading(true);
-        await dispatch(deleteTodo(todo.id));
-        setIsLoading(false);
+        try {
+            setIsLoading(true);
+            await deleteItem(todo.id);
+            await refreshData();
+            setIsLoading(false);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message
+                });
+            }
+        }
     }
 
 

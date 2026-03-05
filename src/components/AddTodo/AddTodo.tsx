@@ -4,13 +4,11 @@ import classes from './AddTodo.module.css';
 
 import { Button, Form, Input, Flex } from 'antd';
 
-import { useAppDispatch } from '../../store/hooks';
-
-import { createTodo } from '../../store/todos/todosActions.ts';
+import { createNewItem } from '../../api/https.ts';
 
 import { MIN_TODO_TITLE_LENGTH, MAX_TODO_TITLE_LENGTH } from '../../validation.ts';
 
-import type { TodoRequest } from '../../types/types';
+import type { ErrorInfo, TodoRequest } from '../../types/types';
 
 import type { FormProps } from 'antd';
 
@@ -19,17 +17,31 @@ type FieldType = {
     title: string;
 }
 
-const AddTodo: React.FC = () => {
+const AddTodo: React.FC<{
+    refreshData: () => Promise<void>;
+    setErrorInfo: (error: ErrorInfo) => void;
+}> = ({ refreshData, setErrorInfo }) => {
 
-    const dispatch = useAppDispatch();
 
 
     const [form] = Form.useForm();  //К этой строчке дошёл не самостоятельно.
 
+
     const handleAddTodo: FormProps<FieldType>['onFinish'] = async (values) => {
-        const todoRequest: TodoRequest = { isDone: false, title: values.title };
-        await dispatch(createTodo(todoRequest));
-        form.resetFields();
+        const todoRequest: TodoRequest = { isDone: false, title: values.title }
+        try {
+            await createNewItem(todoRequest);
+            await refreshData();
+            form.resetFields();
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                setErrorInfo({
+                    isActiveError: true,
+                    message: error.message //TODO: Обратить внимание на текст ошибки
+                });
+            }
+        }
     }
 
     return (

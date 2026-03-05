@@ -2,27 +2,33 @@ import React from 'react';
 
 import TodoItem from '../TodoItem/TodoItem';
 
-import classes from './TodosList.module.css';
+import { List, Spin } from 'antd';
 
-import { List } from 'antd';
+import type { MetaResponse, Todo, TodoInfo, ErrorInfo } from '../../types/types';
 
-import { useAppSelector } from '../../store/hooks';
 
-const TodosList: React.FC = () => {
+const TodosList: React.FC<{
+    todosData: MetaResponse<Todo, TodoInfo>;
+    isLoading: boolean;
+    refreshData: () => Promise<void>;
+    setErrorInfo: (error: ErrorInfo) => void;
 
-    const todosData = useAppSelector((state) => state.todos.todos);
+}> = ({ todosData, refreshData, isLoading, setErrorInfo }) => {
+
+
 
     return (
         <>
-            {!todosData && <p className={classes.loadingText}>Загрузочка...</p>}
-
-            {todosData && <List
+            {isLoading && <Spin />}
+            {(!isLoading) && <List
                 size="large"
                 dataSource={todosData?.data}
                 renderItem={(todo) => <List.Item >
                     <TodoItem
                         key={todo.id}
                         todo={todo}
+                        refreshData={refreshData}
+                        setErrorInfo={setErrorInfo}
                     />
                 </List.Item>}
             />

@@ -63,6 +63,9 @@ export const login = createAsyncThunk<void, AuthData, { rejectValue: string }>('
         const tokens = await userAuthentication(authData);
         accessToken = tokens.accessToken;
         localStorage.setItem('refreshToken', tokens.refreshToken);
+
+        //Сразу профиль получу тогда лучше
+        
     }
     catch (e) {
         if (isAxiosError(e)) {
