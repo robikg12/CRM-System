@@ -9,6 +9,7 @@ const initialState: {
     isAuthorized: boolean;
     status: AsyncStatus;
     authStatus: AsyncStatus;
+    registrationStatus: AsyncStatus;
     error: {
         message: string | null;
         count: number;
@@ -31,6 +32,7 @@ const initialState: {
     isAuthorized: false,
     status: 'idle',
     authStatus: 'idle',
+    registrationStatus: 'idle',
     error: {
         message: null,
         count: 0
@@ -97,15 +99,15 @@ export const userSlice = createSlice({
 
 
         builder.addCase(registration.pending, (state) => {
-            //state.authStatus = 'pending';
+            state.registrationStatus = 'pending';
         })
             .addCase(registration.fulfilled, (state) => {
-                //
+                state.registrationStatus = 'fulfilled'
                 //Не стал записывать данные профиля, т.к по идее пользователь может просто зарегистрироваться, но не входить. 
                 state.error.message = null;
             })
             .addCase(registration.rejected, (state, action) => {
-                // state.authStatus = 'rejected';
+                state.registrationStatus = 'rejected';
                 if (action.payload) {
                     state.error.message = action.payload;
                     state.error.count++;

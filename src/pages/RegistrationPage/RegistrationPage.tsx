@@ -25,7 +25,7 @@ const RegistrationPage: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const registrationServerError = useAppSelector((state) => state.user.error.message);
-    const authStatus = useAppSelector((state) => state.user.authStatus);
+    const registrationStatus = useAppSelector((state) => state.user.registrationStatus);
 
     const [registrationLocalError, setRegistrationLocalError] = useState<string>('');
     const [registrationIsSuccessful, setRegistrationIsSuccessful] = useState<boolean>(false);
@@ -43,7 +43,7 @@ const RegistrationPage: React.FC = () => {
 
     useEffect(() => {
 
-        if (authStatus === 'fulfilled' && registrationServerError === null) {
+        if (registrationStatus === 'fulfilled' && registrationServerError === null) {
             // понимаю, что мог бы не создавать этот стейт,
             // но почему-то посчитал, что правильнее будет создать переменную, 
             // отвечающую за успешную регистрациию, чем писать условие у jsx 
@@ -57,7 +57,7 @@ const RegistrationPage: React.FC = () => {
             setRegistrationLocalError(registrationServerError);
         }
 
-    }, [authStatus, registrationServerError])
+    }, [registrationStatus, registrationServerError])
 
     return <>
 
