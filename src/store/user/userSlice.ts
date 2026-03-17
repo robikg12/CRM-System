@@ -43,14 +43,17 @@ export const userSlice = createSlice({
     reducers: {
     },
     extraReducers(builder) {
+        builder.addCase(getProfile.pending, (state) => {
+            state.status = 'pending';
+        })
         builder.addCase(getProfile.fulfilled, (state, action) => {
-            // state.status = 'fulfilled';
+            state.status = 'fulfilled';
+            state.isAuthorized = true;
             state.error.message = null;
             state.profile = action.payload;
-            // Посмотреть ещё про isAuthorized
         })
             .addCase(getProfile.rejected, (state, action) => {
-                // state.status = 'rejected';
+                state.status = 'rejected';
                 if (action.payload) {
                     state.error.message = action.payload;
                     state.error.count++;
@@ -76,6 +79,7 @@ export const userSlice = createSlice({
 
 
         builder.addCase(login.pending, (state) => {
+            state.status = 'idle';
             state.authStatus = 'pending';
         })
             .addCase(login.fulfilled, (state) => {
@@ -109,16 +113,19 @@ export const userSlice = createSlice({
             });
 
         builder.addCase(logout.pending, (state) => {
-            // state.status = 'pending';
+            state.status = 'pending';
             state.authStatus = 'idle';
         })
             .addCase(logout.fulfilled, (state) => {
+                state.status = 'idle';
+                state.authStatus = 'idle';
                 state.isAuthorized = false;
                 state.profile = initialState.profile;
             })
             .addCase(logout.rejected, (state, action) => {
+                state.status = 'idle';
+                state.authStatus = 'idle';
                 state.isAuthorized = false;
-                // state.status = 'rejected';
                 state.profile = initialState.profile;
                 if (action.payload) {
                     state.error.message = action.payload;

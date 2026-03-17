@@ -25,7 +25,7 @@ const AuthenticationPage: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const serverError = useAppSelector(state => state.user.error);
-    const { isAuthorized, authStatus } = useAppSelector(state => state.user);
+    const { authStatus } = useAppSelector(state => state.user);
 
     const [localError, setLocalError] = useState<string>('');
 
@@ -41,7 +41,7 @@ const AuthenticationPage: React.FC = () => {
         }
     }, [serverError.count, serverError])
 
-    if (authStatus === 'fulfilled' && isAuthorized) {
+    if (authStatus === 'fulfilled') {
         return <Navigate to='/' />;
     }
 

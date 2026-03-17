@@ -4,9 +4,7 @@ import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
 import { logout } from '../../store/user/userActions';
 
-import { Typography } from 'antd';
-
-import { Descriptions } from 'antd';
+import { Typography, Descriptions } from 'antd';
 import type { DescriptionsProps } from 'antd';
 
 
@@ -15,6 +13,7 @@ import type { DescriptionsProps } from 'antd';
 const { Title } = Typography;
 
 const ProfilePage: React.FC = () => {
+
 
     const dispatch = useAppDispatch();
 
