@@ -97,15 +97,15 @@ export const userSlice = createSlice({
 
 
         builder.addCase(registration.pending, (state) => {
-            state.authStatus = 'pending';
+            //state.authStatus = 'pending';
         })
             .addCase(registration.fulfilled, (state) => {
-                state.authStatus = 'fulfilled';
+                //
                 //Не стал записывать данные профиля, т.к по идее пользователь может просто зарегистрироваться, но не входить. 
                 state.error.message = null;
             })
             .addCase(registration.rejected, (state, action) => {
-                state.authStatus = 'rejected';
+                // state.authStatus = 'rejected';
                 if (action.payload) {
                     state.error.message = action.payload;
                     state.error.count++;
