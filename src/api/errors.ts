@@ -1,0 +1,1 @@
+export const generalErrorMessages: string[] = ['Серверная ошибка', 'Ошибка =/', 'Токен истёк'];

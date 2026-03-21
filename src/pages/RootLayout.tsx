@@ -68,9 +68,11 @@ const RootLayout: React.FC = () => {
     // Переделывать всё под axios interceptors будет давольно муторно, да может и не нужно, если в этой задаче нужно было
     // также использовать redux. В общем, прошу осветить этот вопрос в код ревью. 
     useEffect(() => {
-        setInterval(async () => {
+        const intervalId = setInterval(async () => {
             await dispatch(checkAuth());
         }, 150000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
 

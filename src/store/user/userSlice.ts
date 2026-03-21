@@ -83,8 +83,10 @@ export const userSlice = createSlice({
         builder.addCase(login.pending, (state) => {
             state.status = 'idle';
             state.authStatus = 'pending';
+            state.error.message = null;
         })
             .addCase(login.fulfilled, (state) => {
+                state.registrationStatus = 'idle';
                 state.isAuthorized = true;
                 state.authStatus = 'fulfilled';
                 state.error.message = null;
@@ -100,6 +102,7 @@ export const userSlice = createSlice({
 
         builder.addCase(registration.pending, (state) => {
             state.registrationStatus = 'pending';
+            state.error.message = null;
         })
             .addCase(registration.fulfilled, (state) => {
                 state.registrationStatus = 'fulfilled'
@@ -117,12 +120,14 @@ export const userSlice = createSlice({
         builder.addCase(logout.pending, (state) => {
             state.status = 'pending';
             state.authStatus = 'idle';
+            state.error.message = null;
         })
             .addCase(logout.fulfilled, (state) => {
                 state.status = 'idle';
                 state.authStatus = 'idle';
                 state.isAuthorized = false;
                 state.profile = initialState.profile;
+                state.error.message = null;
             })
             .addCase(logout.rejected, (state, action) => {
                 state.status = 'idle';

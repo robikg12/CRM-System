@@ -3,21 +3,21 @@ import classes from './RegistrationPage.module.css';
 import AuthDesignIcon from '../../assets/img/icons/AuthenticationDesignIcon.svg?react';
 import OverflowCircle from '../../assets/img/design/Authentication/overflowCircle.svg?react';
 
-import type { UserRegistrationData } from '../../types/types';
-
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 
+import { generalErrorMessages } from '../../api/errors.ts';
 
 import { registration } from '../../store/user/userActions';
 
-import type { FormProps } from 'antd';
+
 import { Form, Input } from 'antd';
 
 import { isRusAndEngLettersRegexp, isEngLettersRegexp, isValidRusPhoneRegexp } from '../../validation.ts';
 
+import type { UserRegistrationData } from '../../types/types';
+import type { FormProps } from 'antd';
 
 
 const RegistrationPage: React.FC = () => {
@@ -27,37 +27,11 @@ const RegistrationPage: React.FC = () => {
     const registrationServerError = useAppSelector((state) => state.user.error.message);
     const registrationStatus = useAppSelector((state) => state.user.registrationStatus);
 
-    const [registrationLocalError, setRegistrationLocalError] = useState<string>('');
-    const [registrationIsSuccessful, setRegistrationIsSuccessful] = useState<boolean>(false);
-
     const handleSignup: FormProps<UserRegistrationData>['onFinish'] = async (signupData) => {
-
-        if (signupData.password !== signupData.repeatedPassword) {
-
-            setRegistrationLocalError('Пароли должны совпадать');
-            return
-        }
 
         await dispatch(registration(signupData));
     };
 
-    useEffect(() => {
-
-        if (registrationStatus === 'fulfilled' && registrationServerError === null) {
-            // понимаю, что мог бы не создавать этот стейт,
-            // но почему-то посчитал, что правильнее будет создать переменную, 
-            // отвечающую за успешную регистрациию, чем писать условие у jsx 
-            setRegistrationIsSuccessful(true);
-            return
-        }
-
-        //Решил разместить здесь, а не в уведомлении, т.к по идее когда
-        //  что-то не так с данными для регистрации, то сообщение отображается рядом с формой
-        if ((registrationServerError) && (registrationServerError !== 'Серверная ошибка' && registrationServerError !== 'Ошибка =/')) {
-            setRegistrationLocalError(registrationServerError);
-        }
-
-    }, [registrationStatus, registrationServerError])
 
     return <>
 
@@ -67,7 +41,7 @@ const RegistrationPage: React.FC = () => {
 
             <h1>Create your account</h1>
 
-            {!registrationIsSuccessful &&
+            {!(registrationStatus === 'fulfilled' && registrationServerError === null) &&
                 <Form onFinish={handleSignup}>
                     <label htmlFor="name">Your name *</label>
                     <Form.Item<UserRegistrationData>
@@ -103,9 +77,17 @@ const RegistrationPage: React.FC = () => {
                     <label htmlFor="repeat-pwd">Repeat password *</label>
                     <Form.Item<UserRegistrationData>
                         name="repeatedPassword"
+                        dependencies={['password']}
                         rules={[
                             { required: true, message: "Введите пароль" },
-                            { min: 6, max: 60, message: "Пароль должен содержать от 6 до 60 символов" }
+                            ({ getFieldValue }) => ({ //Скопировал код с antd доки
+                                validator(_, value) {
+                                    if (!value || getFieldValue('password') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error('Пароли должны совпадать'));
+                                },
+                            }),
                         ]}>
                         <Input type="password" id="repeat-pwd" />
                     </Form.Item>
@@ -141,11 +123,15 @@ const RegistrationPage: React.FC = () => {
                 </Form>}
 
 
-            {registrationLocalError && <div className={classes.errorBlock}>
-                {registrationLocalError}
-            </div>}
+            {
+                registrationServerError &&
+                !generalErrorMessages.includes(registrationServerError) &&
+                <div className={classes.errorBlock}>
+                    {registrationServerError}
+                </div>
+            }
 
-            {registrationIsSuccessful &&
+            {(registrationStatus === 'fulfilled' && registrationServerError === null) &&
                 <div className={classes.successfulRegistrationBlock}>
                     <p>Регистрация прошла успешно</p>
                     <Link to='/authentication'>Login</Link>

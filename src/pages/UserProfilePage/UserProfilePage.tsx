@@ -14,7 +14,7 @@ import { isRusAndEngLettersRegexp, isValidRusPhoneRegexp } from '../../validatio
 
 import { updateUserProfile } from '../../api/https.ts';
 
-import type { User, UserRequest, ErrorInfo } from '../../types/types';
+import type { Profile, UserRequest, ErrorInfo } from '../../types/types';
 import type { FormProps } from 'antd';
 
 
@@ -33,7 +33,7 @@ const UserProfilePage: React.FC = () => {
         }>();
 
     const { userId } = useParams();
-    const [userInfo, setUserInfo] = useState<User>({
+    const [userInfo, setUserInfo] = useState<Profile>({
         id: 0,
         username: '',
         email: '',
@@ -45,7 +45,7 @@ const UserProfilePage: React.FC = () => {
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
 
-    const editProfile: FormProps<UserRequest>['onFinish'] = async (userData) => {
+    const onEditProfile: FormProps<UserRequest>['onFinish'] = async (userData) => {
 
         if (!(isAdmin || isModerator)) {
             return
@@ -125,7 +125,7 @@ const UserProfilePage: React.FC = () => {
 
             {isEditing && <Form
                 id="updateProfileForm" //Загуглил, что можно вне формы разместить submit button
-                onFinish={editProfile}
+                onFinish={onEditProfile}
                 style={{ display: 'flex', flexGrow: '1' }}>
                 <div>
                     <p>Имя</p>

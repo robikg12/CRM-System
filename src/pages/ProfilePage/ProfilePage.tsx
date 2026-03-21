@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from "../../store/hooks";
 
 import { logout } from '../../store/user/userActions';
 
-import { Typography, Descriptions } from 'antd';
+import { Typography, Descriptions, Spin } from 'antd';
 import type { DescriptionsProps } from 'antd';
 
 
@@ -29,26 +29,31 @@ const ProfilePage: React.FC = () => {
         {
             key: '1',
             label: 'Ваше имя',
-            children: profileData.username,
+            children: profileData.username || '',
         },
         {
             key: '2',
             label: 'Ваша почта',
-            children: profileData.email,
+            children: profileData.email || '',
         },
         {
             key: '3',
             label: 'Ваш номер телефона',
-            children: profileData.phoneNumber,
+            children: profileData.phoneNumber || '',
         }
     ];
 
 
+    if (!profileData) {
+        return <Spin />
+    }
     return <>
         <Title>
             привет
         </ Title>
-        {profileData && <div style={{ width: '30%', padding: '0px 40px 0px 40px' }}><Descriptions title="Данные" items={items} layout='vertical' /></div>}
+        <div style={{ width: '30%', padding: '0px 40px 0px 40px' }}>
+            <Descriptions title="Данные" items={items} layout='vertical' />
+        </div>
         <button onClick={handleLogout} className={classes.logoutButton}>Logout</button>
     </>
 

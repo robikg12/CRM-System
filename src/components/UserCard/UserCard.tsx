@@ -6,14 +6,14 @@ import { Link } from 'react-router-dom';
 
 import { blockUser, deleteUser, unblockUser, updateUserRoles } from '../../api/https';
 
-import { Form, Modal, Button, Select, Tag } from 'antd';
+import { Modal, Button, Select, Tag } from 'antd';
 
 import { UserOutlined, DeleteOutlined, EditOutlined, StopOutlined, SaveOutlined } from '@ant-design/icons';
 import EnvelopeIcon from '../../assets/img/icons/envelope.svg?react';
 import PhoneIcon from '../../assets/img/icons/phone.svg?react';
 import ArrowIcon from '../../assets/img/icons/arrow.svg?react';
 
-import type { Roles, User, ErrorInfo } from '../../types/types';
+import type { Role, Profile, ErrorInfo } from '../../types/types';
 import type { SelectProps } from 'antd';
 
 
@@ -44,16 +44,17 @@ const tagRender: TagRender = (props) => {
     );
 };
 
-
 type ActionToConfirm = 'block' | 'delete' | 'updateRoles' | null;
 
-const UserCard: React.FC<{
-    user: User,
-    isAdmin: boolean,
-    isModerator: boolean,
-    getUsers: () => Promise<void>,
-    handleSetErrorInfo: (ErrorInfo: ErrorInfo) => void,
-}> = ({ user, isAdmin, isModerator, getUsers, handleSetErrorInfo }) => {
+interface Props {
+    user: Profile;
+    isAdmin: boolean;
+    isModerator: boolean;
+    getUsers: () => Promise<void>;
+    handleSetErrorInfo: (ErrorInfo: ErrorInfo) => void;
+}
+
+const UserCard: React.FC<Props> = ({ user, isAdmin, isModerator, getUsers, handleSetErrorInfo }) => {
 
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
@@ -62,7 +63,7 @@ const UserCard: React.FC<{
     //единственное, что удалось придумать, 
     // чтобы разные функции использовали одно модальное окно.
     const [isRoleEditing, setIsRoleEditing] = useState<boolean>(false);
-    const [editedRoles, setEditedRoles] = useState<Roles[]>([]);
+    const [editedRoles, setEditedRoles] = useState<Role[]>([]);
 
     const registrationDate = new Date(user.date);
     const formattedRegistrationDate = registrationDate.toLocaleDateString('ru-RU');
@@ -90,7 +91,7 @@ const UserCard: React.FC<{
             await handleChangeBlock();
         }
         if (actionToConfirm === 'delete' && isAdmin) {
-            await handleDeleteUser(user.id.toString());
+            await handleDeleteUser();
         }
         if (actionToConfirm === 'updateRoles' && isAdmin) {
             await handleUpdateUserRoles();
@@ -130,13 +131,13 @@ const UserCard: React.FC<{
         }
     }
 
-    const handleDeleteUser = async (userId: string) => { //Понимаю, что мог бы обойтись без параметра. Не знаю как лучше даже.
+    const handleDeleteUser = async () => {
 
         if (!isAdmin) {
             return
         }
         try {
-            await deleteUser(userId);
+            await deleteUser(user.id.toString());
             await getUsers();
         }
         catch (error) {
@@ -165,84 +166,85 @@ const UserCard: React.FC<{
     }
 
     return <div className={classes.card}>
-        <Form className={classes.form}>
-            <div style={{ flexBasis: '16%' }}>
-                {/*Чекбокс есть в дизайне, но не используется, лучше уберу его наверное <Checkbox /> */}
-                <div className={classes.personIcon}>
-                    <UserOutlined style={{ fontSize: '18px', color: '#a0a0a0' }} />
-                </div>
-                <p>{user.username}</p>
+        <div style={{ flexBasis: '16%' }}>
+            {/*Чекбокс есть в дизайне, но не используется, лучше уберу его наверное <Checkbox /> */}
+            <div className={classes.personIcon}>
+                <UserOutlined style={{ fontSize: '18px', color: '#a0a0a0' }} />
             </div>
+            <p>{user.username}</p>
+        </div>
 
-            <div style={{ flexBasis: '16%' }}>
-                <EnvelopeIcon style={{ width: '20px', height: '20px' }} />
-                {/* TODO: Добавить семантический email */}
-                <p className={classes.emailAdress}>
-                    {user.email}
-                </p>
-            </div>
+        <div style={{ flexBasis: '16%' }}>
+            <EnvelopeIcon style={{ width: '20px', height: '20px' }} />
+            {/* TODO: Добавить семантический email */}
+            <p className={classes.emailAdress}>
+                {user.email}
+            </p>
+        </div>
 
-            <div style={{ flexBasis: '16%' }}>
-                <PhoneIcon style={{ width: '20px', height: '20px' }} />
-                <p className={classes.phoneNumber}>
-                    {user.phoneNumber}
-                </p>
-            </div>
+        <div style={{ flexBasis: '16%' }}>
+            <PhoneIcon style={{ width: '20px', height: '20px' }} />
+            <p className={classes.phoneNumber}>
+                {user.phoneNumber}
+            </p>
+        </div>
 
-            <div style={{ flexBasis: '16%' }}>
-                {!isRoleEditing && user.roles.map((role) => {
-                    return <div className={`${classes.roleBlock} ${classes[role.toLowerCase()]}`}>
-                        {role}
-                    </div>
-                })
+        <div style={{ flexBasis: '16%' }}>
+            {!isRoleEditing && user.roles.map((role) => {
+                return <Tag
+                    key={role}
+                    color={role === 'USER' ? 'magenta' : role === 'MODERATOR' ? 'orange' : role === 'ADMIN' ? 'blue' : 'default'}
+                    style={{ marginInlineEnd: 4 }}
+                >
+                    {role}
+                </Tag>
+            })
+            }
+
+            {isAdmin && <>
+                {isRoleEditing && <Select
+                    onChange={setEditedRoles}
+                    mode="multiple"
+                    tagRender={tagRender}
+                    defaultValue={user.roles}
+                    style={{ width: '100%' }}
+                    options={options}
+                />
                 }
 
-                {isAdmin && <>
-                    {isRoleEditing && <Select
-                        onChange={setEditedRoles}
-                        mode="multiple"
-                        tagRender={tagRender}
-                        defaultValue={user.roles}
-                        style={{ width: '100%' }}
-                        options={options}
-                    />
-                    }
+                {!isRoleEditing ? <EditOutlined onClick={() => { setIsRoleEditing(true) }} style={{ marginLeft: '20px', color: "#727272" }} /> :
+                    <>
+                        <SaveOutlined onClick={() => { showModal('updateRoles') }} style={{ fontSize: '20px', color: "#727272", marginLeft: '20px' }} />
+                        <StopOutlined onClick={() => { setIsRoleEditing(false) }} style={{ fontSize: '20px', color: "#727272", margin: '0px 10px 0px 10px' }} />
+                    </>}
+            </>}
+        </div>
 
-                    {!isRoleEditing ? <EditOutlined onClick={() => { setIsRoleEditing(true) }} style={{ marginLeft: '20px', color: "#727272" }} /> :
-                        <>
-                            <SaveOutlined onClick={() => { showModal('updateRoles') }} style={{ fontSize: '20px', color: "#727272", marginLeft: '20px' }} />
-                            <StopOutlined onClick={() => { setIsRoleEditing(false) }} style={{ fontSize: '20px', color: "#727272", margin: '0px 10px 0px 10px' }} />
-                        </>}
-                </>}
-            </div>
+        <div style={{ flexBasis: '16%' }}>
+            <p className={classes.grayText}>{user.isBlocked ? "+" : '-'}</p>
+        </div>
 
-            <div style={{ flexBasis: '16%' }}>
-                <p className={classes.grayText}>{user.isBlocked ? "+" : '-'}</p>
-            </div>
+        <div style={{ flexBasis: '8%' }}>
+            <p className={classes.grayText}>{formattedRegistrationDate}</p>
+        </div>
 
-            <div style={{ flexBasis: '8%' }}>
-                <p className={classes.grayText}>{formattedRegistrationDate}</p>
-            </div>
+        <div style={{ flexBasis: '8%' }}>
+            {(isAdmin || isModerator) && <button onClick={() => { showModal('block') }} className={classes.blockButton}>
+                {user.isBlocked ? 'разблок' : 'блок'}
+            </button>}
 
-            <div style={{ flexBasis: '8%' }}>
-                {(isAdmin || isModerator) && <button onClick={() => { showModal('block') }} className={classes.blockButton}>
-                    {user.isBlocked ? 'разблок' : 'блок'}
-                </button>}
+            <Link to={`${user.id}`}>
+                <button className={` ${classes.goToProfileButton} ${classes.blockButton}`}>
+                    <ArrowIcon style={{ width: '12px', height: '8px' }} />
+                </button>
+            </Link>
+        </div>
 
-                <Link to={`${user.id}`}>
-                    <button className={` ${classes.goToProfileButton} ${classes.blockButton}`}>
-                        <ArrowIcon style={{ width: '12px', height: '8px' }} />
-                    </button>
-                </Link>
-            </div>
-
-            <div style={{ flexBasis: '4%' }}>
-                {isAdmin && <Button onClick={() => { showModal('delete') }} style={{ marginLeft: 'auto' }}>
-                    <DeleteOutlined />
-                </Button>}
-            </div>
-        </Form >
-
+        <div style={{ flexBasis: '4%' }}>
+            {isAdmin && <Button onClick={() => { showModal('delete') }} style={{ marginLeft: 'auto' }}>
+                <DeleteOutlined />
+            </Button>}
+        </div>
 
         <Modal
             title="Подтвердите действие"
@@ -253,7 +255,6 @@ const UserCard: React.FC<{
         >
             <p>{modalText}</p>
         </Modal>
-
     </div >
 }
 

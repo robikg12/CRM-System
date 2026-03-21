@@ -8,15 +8,15 @@ import { useOutletContext, Navigate } from 'react-router';
 import { fetchUsers } from '../../api/https';
 
 
-import FilterIcon from '../../assets/img/icons/filter.svg?react';
 import VerticalArrow from '../../assets/img/icons/verticalArrow.svg?react';
 
 import { Typography, Divider, Form, Input, List, Pagination, Select } from 'antd';
-
+import { SearchOutlined } from '@ant-design/icons';
 
 import type { ErrorInfo } from '../../types/types.ts';
-import type { UserFilters, UsersMetaResponse, User } from '../../types/types.ts';
+import type { UserFilters, UsersMetaResponse, Profile } from '../../types/types.ts';
 import type { FormProps, PaginationProps } from 'antd';
+
 
 const { Title } = Typography;
 
@@ -33,7 +33,7 @@ const AdminPanel: React.FC = () => {
             isModerator: boolean,
             handleSetErrorInfo: (ErrorInfo: ErrorInfo) => void
         }>();
-    const [usersInfo, setUsersInfo] = useState<UsersMetaResponse<User>>({
+    const [usersInfo, setUsersInfo] = useState<UsersMetaResponse<Profile>>({
         data: [],
         meta: {
             totalAmount: 0,
@@ -107,7 +107,7 @@ const AdminPanel: React.FC = () => {
         })
     }
 
-    const searchByName: FormProps<FieldType>['onFinish'] = (values) => { //TODO: Название функции неправильное
+    const handleSearchByName: FormProps<FieldType>['onFinish'] = (values) => { //TODO: Название функции неправильное
 
         if (!(isAdmin || isModerator)) {
             return
@@ -121,7 +121,7 @@ const AdminPanel: React.FC = () => {
         });
     };
 
-    const handleSortIsBlocked = (value: 'all' | 'blocked' | 'unblocked') => {
+    const filterByStatus = (value: 'all' | 'blocked' | 'unblocked') => {
 
         if (!isAdmin) {
             return
@@ -168,15 +168,15 @@ const AdminPanel: React.FC = () => {
 
             <Form
                 className={classes.filterForm}
-                onFinish={searchByName}
+                onFinish={handleSearchByName}
             >
                 <Title level={3} style={{ margin: '0px auto 0px 0px' }}>Пользователи</Title>
                 <Form.Item name="username">
                     <Input disabled={!(isAdmin || isModerator)} className={classes.filterInput} />
                 </Form.Item>
                 <button type='submit' className={classes.filterButton} disabled={!(isAdmin || isModerator)}>
-                    <FilterIcon style={{ width: '16px', height: '16px' }} />
-                    Filter
+                    <SearchOutlined style={{ width: '16px', height: '16px' }} />
+                    Поиск
                 </button>
             </Form>
 
@@ -221,7 +221,7 @@ const AdminPanel: React.FC = () => {
                     <Select
                         defaultValue='all'
                         style={{ width: 210, backgroundColor: '#F9F9F9' }}
-                        onChange={handleSortIsBlocked}
+                        onChange={filterByStatus}
                         options={[
                             { value: 'all', label: 'Все пользователи' },
                             { value: 'blocked', label: 'Заблокированные' },

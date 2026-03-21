@@ -75,15 +75,6 @@ export interface UserFilters {
     page?: number;  // страницу
 }
 
-export interface User {
-    id: number;
-    username: string;
-    email: string;
-    date: string; // ISO date string 
-    isBlocked: boolean;
-    roles: Roles[];
-    phoneNumber: string;
-}
 
 export interface UsersMetaResponse<T> {
     data: T[]
@@ -95,9 +86,7 @@ export interface UsersMetaResponse<T> {
 }
 
 export interface UserRolesRequest {
-    roles: Roles[]  // при вызове этой апи роли будут обновлены к тому массиву который будет передан
-    // например если у вас была roles: ['ADMIN'] а вы хотите добавить ['MODERATOR'] то нужно передавать 
-    // старые + новые - roles: ['ADMIN', 'MODERATOR'] 
+    roles: Role[]
 }
 
 export interface UserRequest {
@@ -105,9 +94,6 @@ export interface UserRequest {
     email?: string;
     phoneNumber?: string;
 }
-
-export type Roles = "ADMIN" | "MODERATOR" | "USER"
-
 
 
 
