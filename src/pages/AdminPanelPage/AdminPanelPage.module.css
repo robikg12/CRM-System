@@ -1,0 +1,111 @@
+@font-face {
+    font-family: Inter;
+    src: url(../../assets/fonts/Inter.ttf);
+}
+
+.pageWrapper {
+    width: 100%;
+    height: 100%;
+}
+
+.pageTitle {
+    margin-left: 34px;
+}
+
+.userListSection {
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 32px 18px 32px 18px;
+    width: calc(100% - 60px);
+
+    min-height: 200px;
+    background-color: #FFFFFF;
+    border: 1px solid #E4E4E4;
+    border-radius: 8px;
+}
+
+.filterButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0px 8px;
+    box-sizing: border-box;
+    padding: 0px;
+    margin-left: 16px;
+    width: 98px;
+    height: 37px;
+    background-color: white;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    line-height: 1.5;
+    color: #000000;
+    font-size: 15px;
+    font-family: Inter;
+    cursor: pointer;
+}
+
+.filterForm {
+    display: flex;
+    align-items: center;
+}
+
+.filterInput {
+    width: 360px;
+    height: 41px;
+}
+
+.tableHeader {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    height: 45px;
+    margin: 18px 0px 0px 0px;
+    padding: 0px 12px 0px 12px;
+    background-color: #F9F9F9;
+    border: 1px solid #E4E4E4;
+    border-radius: 4px;
+}
+
+.tableHeader>div {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    height: 100%;
+    font-family: Inter;
+    font-size: 14px;
+    color: #727272;
+    line-height: 1.5;
+}
+
+.tableHeader>div>div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 11px;
+}
+
+.tableHeader>div>div>svg {
+    cursor: pointer;
+}
+
+.tableHeader>div>div>svg:last-child {
+    margin-top: 3px;
+    transform: rotate(180deg);
+}
+
+.tableHeader>div>p {
+    cursor: pointer;
+}
+
+.activeSortOrder {
+    width: 18px;
+    height: 9px;
+}
+
+.activeColumnTitle {
+    font-weight: 500;
+    color: #5e5e5e;
+}
+

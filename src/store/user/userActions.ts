@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import { fetchUserProfile, refreshTokens, userAuthentication, registerNewUser, userLogout } from '../../api/https.ts';
+import { fetchUserProfile, refreshTokens, authorizeUser, registerNewUser, logoutUser } from '../../api/https.ts';
 import type { Profile, AuthData, UserRegistrationData } from '../../types/types.ts';
 
 import { isAxiosError } from 'axios';
@@ -60,12 +60,10 @@ export const checkAuth = createAsyncThunk<void, undefined, { rejectValue: string
 export const login = createAsyncThunk<void, AuthData, { rejectValue: string }>('user/login', async (authData, thunkAPI) => {
 
     try {
-        const tokens = await userAuthentication(authData);
+        const tokens = await authorizeUser(authData);
         accessToken = tokens.accessToken;
         localStorage.setItem('refreshToken', tokens.refreshToken);
 
-        //Сразу профиль получу тогда лучше
-        
     }
     catch (e) {
         if (isAxiosError(e)) {
@@ -119,7 +117,7 @@ export const logout = createAsyncThunk<void, undefined, { rejectValue: string }>
     try {
         const tokens = await refreshTokens(refreshToken);
         accessToken = tokens.accessToken;
-        await userLogout();
+        await logoutUser();
         localStorage.removeItem('refreshToken');
         accessToken = null;
     }

@@ -2,8 +2,13 @@ import axios from 'axios';
 
 import type {
     MetaResponse, Todo, Category, TodoInfo,
-    TodoRequest, UserRegistrationData,
-    Profile, AuthData, Tokens
+    TodoRequest,
+
+    UserRegistrationData,
+    Profile, AuthData, Tokens,
+
+    UserFilters, UsersMetaResponse, UserRequest,
+    Role
 } from '../types/types';
 
 import { accessToken } from '../store/user/userActions';
@@ -33,9 +38,6 @@ apiClient.interceptors.request.use(
         return Promise.reject(error);
     }
 );
-
-
-
 
 
 
@@ -74,7 +76,7 @@ export async function registerNewUser(registrationData: UserRegistrationData): P
     return response.data;
 }
 
-export async function userAuthentication(authData: AuthData): Promise<Tokens> {
+export async function authorizeUser(authData: AuthData): Promise<Tokens> {
     const response = await apiClient.post('/auth/signin', authData);
     return response.data;
 }
@@ -91,11 +93,44 @@ export async function refreshTokens(refreshToken: string): Promise<Tokens> {
     return response.data;
 }
 
-export async function userLogout() {
+export async function logoutUser(): Promise<void> {
     await apiClient.post('/user/logout');
 }
 
+export async function fetchUsers(filterRequest: UserFilters): Promise<UsersMetaResponse<Profile>> {
+    const response = await apiClient.get('/admin/users', {
+        params: filterRequest
+    });
+    return response.data;
+}
 
+export async function fetchUser(userId: string): Promise<Profile> {
+    const response = await apiClient.get(`/admin/users/${userId}`);
+    return response.data;
+}
 
+export async function blockUser(userId: string): Promise<Profile> {
+    const response = await apiClient.post(`/admin/users/${userId}/block`);
+    return response.data;
+}
 
+export async function unblockUser(userId: string): Promise<Profile> {
+    const response = await apiClient.post(`/admin/users/${userId}/unblock`)
+    return response.data;
+}
 
+export async function updateUserProfile(userId: string, userData: UserRequest): Promise<Profile> {
+
+    const response = await apiClient.put(`/admin/users/${userId}`, userData);
+    return response.data;
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+    await apiClient.delete(`/admin/users/${userId}`);
+}
+
+export async function updateUserRoles(userId: string, roles: Role[]): Promise<Profile> {
+
+    const response = await apiClient.post(`/admin/users/${userId}/rights`, { roles: roles });
+    return response.data;
+}

@@ -9,6 +9,7 @@ const initialState: {
     isAuthorized: boolean;
     status: AsyncStatus;
     authStatus: AsyncStatus;
+    registrationStatus: AsyncStatus;
     error: {
         message: string | null;
         count: number;
@@ -31,6 +32,7 @@ const initialState: {
     isAuthorized: false,
     status: 'idle',
     authStatus: 'idle',
+    registrationStatus: 'idle',
     error: {
         message: null,
         count: 0
@@ -43,14 +45,17 @@ export const userSlice = createSlice({
     reducers: {
     },
     extraReducers(builder) {
+        builder.addCase(getProfile.pending, (state) => {
+            state.status = 'pending';
+        })
         builder.addCase(getProfile.fulfilled, (state, action) => {
-            // state.status = 'fulfilled';
+            state.status = 'fulfilled';
+            state.isAuthorized = true;
             state.error.message = null;
             state.profile = action.payload;
-            // Посмотреть ещё про isAuthorized
         })
             .addCase(getProfile.rejected, (state, action) => {
-                // state.status = 'rejected';
+                state.status = 'rejected';
                 if (action.payload) {
                     state.error.message = action.payload;
                     state.error.count++;
@@ -76,9 +81,12 @@ export const userSlice = createSlice({
 
 
         builder.addCase(login.pending, (state) => {
+            state.status = 'idle';
             state.authStatus = 'pending';
+            state.error.message = null;
         })
             .addCase(login.fulfilled, (state) => {
+                state.registrationStatus = 'idle';
                 state.isAuthorized = true;
                 state.authStatus = 'fulfilled';
                 state.error.message = null;
@@ -93,15 +101,16 @@ export const userSlice = createSlice({
 
 
         builder.addCase(registration.pending, (state) => {
-            state.authStatus = 'pending';
+            state.registrationStatus = 'pending';
+            state.error.message = null;
         })
             .addCase(registration.fulfilled, (state) => {
-                state.authStatus = 'fulfilled';
+                state.registrationStatus = 'fulfilled'
                 //Не стал записывать данные профиля, т.к по идее пользователь может просто зарегистрироваться, но не входить. 
                 state.error.message = null;
             })
             .addCase(registration.rejected, (state, action) => {
-                state.authStatus = 'rejected';
+                state.registrationStatus = 'rejected';
                 if (action.payload) {
                     state.error.message = action.payload;
                     state.error.count++;
@@ -109,16 +118,21 @@ export const userSlice = createSlice({
             });
 
         builder.addCase(logout.pending, (state) => {
-            // state.status = 'pending';
+            state.status = 'pending';
             state.authStatus = 'idle';
+            state.error.message = null;
         })
             .addCase(logout.fulfilled, (state) => {
+                state.status = 'idle';
+                state.authStatus = 'idle';
                 state.isAuthorized = false;
                 state.profile = initialState.profile;
+                state.error.message = null;
             })
             .addCase(logout.rejected, (state, action) => {
+                state.status = 'idle';
+                state.authStatus = 'idle';
                 state.isAuthorized = false;
-                // state.status = 'rejected';
                 state.profile = initialState.profile;
                 if (action.payload) {
                     state.error.message = action.payload;
