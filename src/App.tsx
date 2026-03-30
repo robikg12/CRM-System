@@ -8,6 +8,8 @@ import ProfilePage from './pages/ProfilePage/ProfilePage';
 import AuthLayout from './pages/AuthLayout/AuthLayout'
 import AuthenticationPage from "./pages/AuthenticationPage/AuthenticationPage";
 import RegistrationPage from "./pages/RegistrationPage/RegistrationPage";
+import AdminPanelPage from "./pages/AdminPanelPage/AdminPanelPage";
+import UserProfilePage from "./pages/UserProfilePage/UserProfilePage";
 
 function App() {
 
@@ -19,11 +21,19 @@ function App() {
       children: [
         {
           index: true,
-          element: <TodoListPage />,
+          element: <TodoListPage />
         },
         {
           path: 'profile',
           element: <ProfilePage />
+        },
+        {
+          path: 'users',
+          element: <AdminPanelPage />
+        },
+        {
+          path: 'users/:userId',
+          element: <UserProfilePage />
         }
       ],
     },

@@ -3,45 +3,35 @@ import classes from './AuthenticationPage.module.css';
 import AuthDesignIcon from '../../assets/img/icons/AuthenticationDesignIcon.svg?react';
 import OverflowCircle from '../../assets/img/design/Authentication/overflowCircle.svg?react';
 
-import { useState, useEffect } from 'react';
-
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 
 import { login } from '../../store/user/userActions';
 
 import { Navigate, Link } from 'react-router';
 
-import type { AuthData } from '../../types/types';
+import { generalErrorMessages } from '../../api/errors';
 
-
-import type { FormProps } from 'antd';
 import { Form, Input } from 'antd';
 
 import { isEngLettersRegexp } from '../../validation';
 
+import type { AuthData } from '../../types/types';
+import type { FormProps } from 'antd';
 
 const AuthenticationPage: React.FC = () => {
 
     const dispatch = useAppDispatch();
 
     const serverError = useAppSelector(state => state.user.error);
-    const { isAuthorized, authStatus } = useAppSelector(state => state.user);
-
-    const [localError, setLocalError] = useState<string>('');
+    const { authStatus } = useAppSelector(state => state.user);
 
     const handleLogin: FormProps<AuthData>['onFinish'] = async (loginInputData) => {
 
         await dispatch(login(loginInputData));
     };
 
-    useEffect(() => {
 
-        if ((serverError.message) && (serverError.message !== 'Серверная ошибка' && serverError.message !== 'Ошибка =/' && serverError.message !== 'Токен истёк')) {
-            setLocalError(serverError.message);
-        }
-    }, [serverError.count, serverError])
-
-    if (authStatus === 'fulfilled' && isAuthorized) {
+    if (authStatus === 'fulfilled') {
         return <Navigate to='/' />;
     }
 
@@ -81,8 +71,9 @@ const AuthenticationPage: React.FC = () => {
         </Form>
 
         {
-            localError && <div className={classes.errorBlock}>
-                {localError}
+            serverError.message &&
+            !generalErrorMessages.includes(serverError.message) && <div className={classes.errorBlock}>
+                {serverError.message}
             </div>
         }
 

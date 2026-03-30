@@ -65,3 +65,36 @@ export type Role = 'ADMIN' | 'USER' | 'MODERATOR';
 export type AsyncStatus = 'idle' | 'pending' | 'fulfilled' | 'rejected';
 
 
+
+export interface UserFilters {
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    isBlocked?: boolean;
+    limit?: number;  // сколько на странице
+    page?: number;  // страницу
+}
+
+
+export interface UsersMetaResponse<T> {
+    data: T[]
+    meta: {
+        totalAmount: number;
+        sortBy: string;
+        sortOrder: 'asc' | 'desc';
+    }
+}
+
+export interface UserRolesRequest {
+    roles: Role[]
+}
+
+export interface UserRequest {
+    username?: string;
+    email?: string;
+    phoneNumber?: string;
+}
+
+
+
+
