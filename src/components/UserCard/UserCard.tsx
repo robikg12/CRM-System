@@ -56,8 +56,8 @@ interface Props {
 
 const UserCard: React.FC<Props> = ({ user, isAdmin, isModerator, getUsers, handleSetErrorInfo }) => {
 
-    const [open, setOpen] = useState(false);
-    const [confirmLoading, setConfirmLoading] = useState(false);
+    const [open, setOpen] = useState<boolean>(false);
+    const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [modalText, setModalText] = useState<string>('');
     const [actionToConfirm, setActionToConfirm] = useState<ActionToConfirm>(null);
     //единственное, что удалось придумать, 
@@ -85,7 +85,7 @@ const UserCard: React.FC<Props> = ({ user, isAdmin, isModerator, getUsers, handl
         }
     };
 
-    const handleOk = async () => {
+    const handleConfirmModal = async () => {
         setConfirmLoading(true);
         if (actionToConfirm === 'block' && (isAdmin || isModerator)) {
             await handleChangeBlock();
@@ -249,7 +249,7 @@ const UserCard: React.FC<Props> = ({ user, isAdmin, isModerator, getUsers, handl
         <Modal
             title="Подтвердите действие"
             open={open}
-            onOk={handleOk}
+            onOk={handleConfirmModal}
             confirmLoading={confirmLoading}
             onCancel={handleCancel}
         >
